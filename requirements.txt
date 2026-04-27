@@ -7,4 +7,8 @@ requests==2.32.5
 sqlparse==0.5.5
 tzdata==2025.3
 urllib3==2.6.2
+<<<<<<< HEAD
 gunicorn
+=======
+gunicorn
+>>>>>>> 637f4a59f5dd924d7d47262ee12593a5b936eab1

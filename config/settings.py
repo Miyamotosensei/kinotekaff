@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c5c4jn6=pds%f#s_-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['kinotekaff-production.up.railway.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
