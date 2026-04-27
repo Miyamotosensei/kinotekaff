@@ -1,8 +1,11 @@
-from django.shortcuts import render
-
 from django.shortcuts import render, redirect
 from .tmdb import search_movies, get_movie
 from .models import Movie, UserMovie
+
+
+def home(request):
+    """Главная страница с популярными фильмами"""
+    return render(request, 'movies/index.html')
 
 
 def search_view(request):
