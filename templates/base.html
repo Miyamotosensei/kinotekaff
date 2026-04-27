@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<<<<<<< HEAD
     <title>Кинотека</title>
 </head>
 <body>
@@ -8,5 +9,443 @@
     <a href="/submit/">Добавить фильм</a>
     <hr>
     {% block content %}{% endblock %}
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Кинотека{% endblock %}</title>
+    <!-- Подключение шрифта Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1f1f1f;
+            --bg-card: #2a2a2a;
+            --accent-orange: #ff6600;
+            --accent-orange-hover: #e65c00;
+            --text-white: #ffffff;
+            --text-gray: #b3b3b3;
+            --rating-green: #3bb33b;
+            --rating-orange: #ff6600;
+            --rating-red: #ff3b3b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--bg-secondary) !important;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-orange) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand:hover {
+            color: var(--accent-orange-hover) !important;
+        }
+
+        .search-form {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            background-color: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-white);
+            width: 100%;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-gray);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            background-color: var(--bg-secondary);
+        }
+
+        .nav-link {
+            color: var(--text-gray) !important;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-orange) !important;
+        }
+
+        .btn-orange {
+            background-color: var(--accent-orange);
+            color: var(--text-white);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-orange:hover {
+            background-color: var(--accent-orange-hover);
+            color: var(--text-white);
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary);
+            padding: 2rem 0;
+            border-top: 1px solid #333;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            margin: 0;
+        }
+
+        /* Movie Card Styles */
+        .movie-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .movie-info {
+            padding: 1rem;
+        }
+
+        .movie-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-year {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+
+        .rating-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-white);
+        }
+
+        .rating-high {
+            background-color: var(--rating-green);
+        }
+
+        .rating-medium {
+            background-color: var(--rating-orange);
+        }
+
+        .rating-low {
+            background-color: var(--rating-red);
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-control {
+            background-color: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-white);
+            margin-bottom: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-gray);
+        }
+
+        .form-control:focus {
+            background-color: var(--bg-card);
+            border-color: var(--accent-orange);
+            color: var(--text-white);
+            box-shadow: none;
+        }
+
+        .form-label {
+            color: var(--text-gray);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+        }
+
+        .auth-link {
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .auth-link:hover {
+            color: var(--accent-orange);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(20, 20, 20, 0.3), var(--bg-primary)),
+                        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920') center/cover;
+            border-radius: 12px;
+            padding: 4rem 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-description {
+            color: var(--text-gray);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Profile Styles */
+        .profile-header {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: var(--text-gray);
+        }
+
+        /* Grid Layout */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .search-form {
+                margin: 1rem 0;
+                max-width: 100%;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .movie-poster {
+                height: 250px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Кинотека</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Bar -->
+                <form class="search-form d-flex" method="get" action="{% url 'search' %}">
+                    <input class="search-input" type="search" name="q" placeholder="Поиск фильмов..." aria-label="Search">
+                </form>
+                
+                <!-- Nav Links -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'upload_movie' %}">Загрузить фильм</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-orange" href="{% url 'logout' %}">Выход</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-orange" href="{% url 'register' %}">Регистрация</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2024 Кинотека. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+>>>>>>> fc475fc86a93a3c7ae9821882178805d0c8e2ea3
 </body>
 </html>

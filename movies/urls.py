@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import search_view, import_movie
+from .views import search_view, import_movie, home
 
 urlpatterns = [
-    path('', search_view, name='search'),
+    path('', home, name='home'),
+    path('search/', search_view, name='search'),
     path('import/<int:tmdb_id>/', import_movie, name='import_movie'),
 ]
