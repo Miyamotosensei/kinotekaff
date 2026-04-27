@@ -1,25 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Кинотека{% endblock %}</title>
+    <title>Кинотека</title>
 </head>
 <body>
-    <nav>
-        <a href="{% url 'home' %}">Главная</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'upload_movie' %}">Загрузить фильм</a>
-            <a href="{% url 'profile' %}">Профиль ({{ user.username }})</a>
-            <a href="{% url 'logout' %}">Выйти</a>
-        {% else %}
-            <a href="{% url 'login' %}">Вход</a>
-            <a href="{% url 'register' %}">Регистрация</a>
-        {% endif %}
-    </nav>
-
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    <a href="/">Поиск</a>
+    <a href="/submit/">Добавить фильм</a>
+    <hr>
+    {% block content %}{% endblock %}
 </body>
 </html>
