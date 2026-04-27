@@ -123,4 +123,4 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # TMDb
-TMDB_API_KEY = "ТВОЙ_API_КЛЮЧ"
+TMDB_API_KEY = "c0c811e14b7d973d41c9c5bbb8d59a58"
