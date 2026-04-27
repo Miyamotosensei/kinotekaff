@@ -1,0 +1,40 @@
+from django.shortcuts import render
+
+from django.shortcuts import render, redirect
+from .tmdb import search_movies, get_movie
+from .models import Movie, UserMovie
+
+
+def search_view(request):
+    query = request.GET.get('q')
+    results = []
+
+    if query:
+        data = search_movies(query)
+        results = data.get('results', [])
+
+    return render(request, 'movies/search.html', {'results': results})
+
+
+def import_movie(request, tmdb_id):
+    data = get_movie(tmdb_id)
+
+    movie, _ = Movie.objects.get_or_create(
+        tmdb_id=tmdb_id,
+        defaults={
+            'title': data['title'],
+            'description': data.get('overview', ''),
+            'year': data.get('release_date', '')[:4] or None,
+            'poster': f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}",
+            'source': 'tmdb'
+        }
+    )
+
+    if request.user.is_authenticated:
+        UserMovie.objects.get_or_create(
+            user=request.user,
+            movie=movie,
+            defaults={'status': 'planned'}
+        )
+
+    return redirect('search')
