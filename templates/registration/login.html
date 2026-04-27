@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход - Кинотека{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Вход</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    <input type="{{ field.field.widget.input_type }}" 
+                           name="{{ field.name }}" 
+                           id="{{ field.id_for_label }}"
+                           class="form-control {% if field.errors %}is-invalid{% endif %}"
+                           placeholder="{{ field.label }}"
+                           {% if field.field.required %}required{% endif %}>
+                    
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-orange btn-full mt-3">Войти</button>
+        </form>
+        
+        <div class="text-center mt-4">
+            <p class="text-muted mb-0">
+                Нет аккаунта? 
+                <a href="{% url 'register' %}" class="auth-link">Зарегистрироваться</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
