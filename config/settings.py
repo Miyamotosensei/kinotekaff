@@ -17,9 +17,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c4jn6=pds%f#s_-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Добавляем домен Railway для production
+if 'kinotekaff-production.up.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('kinotekaff-production.up.railway.app')
 
 # CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = [
@@ -84,7 +87,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 if os.environ.get('DATABASE_URL'):
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
 else:
     DATABASES = {
