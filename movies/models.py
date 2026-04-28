@@ -51,6 +51,9 @@ class Movie(models.Model):
     
     # Автор фильма (пользователь, который загрузил)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='movies')
+    
+    # Флаг пользовательской загрузки
+    is_user_uploaded = models.BooleanField(default=False, help_text="True если фильм загружен пользователем")
 
     tmdb_id = models.IntegerField(null=True, blank=True, unique=True)
     source = models.CharField(max_length=10, choices=SOURCE_CHOICES)

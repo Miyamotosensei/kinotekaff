@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    home, search_view, import_movie, movie_detail, add_movie, 
+    home, search_view, import_movie, movie_detail, add_movie, upload_movie,
     movie_detail_tmdb, delete_comment
 )
 
@@ -12,5 +12,6 @@ urlpatterns = [
     path('movie/<int:pk>/slug/<slug:slug>/', movie_detail, name='movie_detail_slug'),
     path('tmdb/<int:tmdb_id>/', movie_detail_tmdb, name='movie_detail_tmdb'),
     path('add/', add_movie, name='add_movie'),
+    path('upload/', upload_movie, name='upload_movie'),
     path('comment/<int:comment_id>/delete/', delete_comment, name='delete_comment'),
 ]

@@ -201,6 +201,28 @@ def movie_detail(request, pk):
 
 
 @login_required(login_url='login')
+def upload_movie(request):
+    """Форма для загрузки фильма пользователем (алиас для add_movie)"""
+    if request.method == 'POST':
+        form = MovieUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            movie = form.save(commit=False)
+            movie.author = request.user
+            movie.source = 'user'
+            movie.is_user_uploaded = True
+            movie.save()
+            form.save_m2m()  # Сохраняем многие-ко-многим (жанры)
+            return redirect('movie_detail', pk=movie.pk)
+    else:
+        form = MovieUploadForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'movies/upload_movie.html', context)
+
+
+@login_required(login_url='login')
 def add_movie(request):
     """Форма для загрузки фильма пользователем"""
     if request.method == 'POST':
@@ -209,6 +231,7 @@ def add_movie(request):
             movie = form.save(commit=False)
             movie.author = request.user
             movie.source = 'user'
+            movie.is_user_uploaded = True
             movie.save()
             form.save_m2m()  # Сохраняем многие-ко-многим (жанры)
             return redirect('movie_detail', pk=movie.pk)
