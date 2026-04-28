@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить фильм - Кинотека{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-kino-bg py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <a href="{% url 'home' %}" class="text-kino-accent hover:text-kino-accent-hover transition-colors mb-4 inline-flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    Вернуться назад
+                </a>
+                <h1 class="text-4xl font-bold text-white mb-2">Загрузить фильм</h1>
+                <p class="text-gray-400">Поделитесь своим фильмом с сообществом</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-kino-card rounded-lg border border-gray-700 p-8">
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Title Field -->
+                    <div>
+                        <label for="id_title" class="block text-white font-semibold mb-2">
+                            <i class="fas fa-film text-kino-accent mr-2"></i>
+                            Название фильма
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.title.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description Field -->
+                    <div>
+                        <label for="id_description" class="block text-white font-semibold mb-2">
+                            <i class="fas fa-pen text-kino-accent mr-2"></i>
+                            Описание
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Genre Field -->
+                    <div>
+                        <label for="id_genre" class="block text-white font-semibold mb-2">
+                            <i class="fas fa-tags text-kino-accent mr-2"></i>
+                            Жанр
+                        </label>
+                        {{ form.genre }}
+                        {% if form.genre.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.genre.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Year Field -->
+                    <div>
+                        <label for="id_year" class="block text-white font-semibold mb-2">
+                            <i class="fas fa-calendar text-kino-accent mr-2"></i>
+                            Год выпуска
+                        </label>
+                        {{ form.year }}
+                        {% if form.year.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.year.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Poster Field -->
+                    <div class="border-2 border-dashed border-gray-700 rounded-lg p-6 hover:border-kino-accent transition-colors">
+                        <label for="id_poster_file" class="block">
+                            <input 
+                                type="file" 
+                                name="poster_file" 
+                                id="id_poster_file"
+                                class="hidden"
+                                accept="image/*"
+                            >
+                            <div class="cursor-pointer text-center">
+                                <i class="fas fa-image text-4xl text-gray-600 mb-3 block"></i>
+                                <p class="text-white font-semibold mb-1">Выберите постер фильма</p>
+                                <p class="text-gray-500 text-sm">Нажмите или перетащите изображение сюда</p>
+                            </div>
+                        </label>
+                        <div id="posterPreview" class="mt-4 hidden">
+                            <img id="posterImg" src="" alt="Preview" class="w-full rounded-lg max-h-64 object-contain">
+                        </div>
+                        {% if form.poster_file.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.poster_file.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Video File Field -->
+                    <div class="border-2 border-dashed border-gray-700 rounded-lg p-6 hover:border-kino-accent transition-colors">
+                        <label for="id_video_file" class="block">
+                            <input 
+                                type="file" 
+                                name="video_file" 
+                                id="id_video_file"
+                                class="hidden"
+                                accept="video/*"
+                            >
+                            <div class="cursor-pointer text-center">
+                                <i class="fas fa-video text-4xl text-gray-600 mb-3 block"></i>
+                                <p class="text-white font-semibold mb-1">Выберите видеофайл</p>
+                                <p class="text-gray-500 text-sm">Поддерживаемые форматы: MP4, WebM, Ogg</p>
+                            </div>
+                        </label>
+                        <div id="videoPreview" class="mt-4 hidden">
+                            <p class="text-green-500 text-sm">✓ Видеофайл выбран</p>
+                        </div>
+                        {% if form.video_file.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.video_file.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex gap-4 pt-6 border-t border-gray-700">
+                        <button 
+                            type="submit" 
+                            class="flex-1 bg-kino-accent hover:bg-kino-accent-hover text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                        >
+                            <i class="fas fa-upload"></i>
+                            Опубликовать фильм
+                        </button>
+                        <a 
+                            href="{% url 'home' %}" 
+                            class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-all text-center"
+                        >
+                            Отменить
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-8 bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg p-4">
+                <p class="text-blue-300 text-sm flex items-start gap-2">
+                    <i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i>
+                    <span>Убедитесь, что вы имеете права на загружаемый контент. Запрещены пиратские материалы.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Poster preview
+    document.getElementById('id_poster_file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('posterImg').src = event.target.result;
+                document.getElementById('posterPreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Video file preview
+    document.getElementById('id_video_file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('videoPreview').classList.remove('hidden');
+        }
+    });
+
+    // Drag and drop
+    const posterZone = document.querySelector('[for="id_poster_file"]').parentElement;
+    const videoZone = document.querySelector('[for="id_video_file"]').parentElement;
+
+    [posterZone, videoZone].forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('border-kino-accent', 'bg-gray-800');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('border-kino-accent', 'bg-gray-800');
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('border-kino-accent', 'bg-gray-800');
+            
+            const input = zone.querySelector('input[type="file"]');
+            input.files = e.dataTransfer.files;
+            
+            const changeEvent = new Event('change', { bubbles: true });
+            input.dispatchEvent(changeEvent);
+        });
+    });
+</script>
+{% endblock %}

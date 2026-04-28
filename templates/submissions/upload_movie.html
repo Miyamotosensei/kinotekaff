@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить фильм - Кинотека{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4">
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-kino-card rounded-2xl shadow-2xl p-8 border border-gray-800">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-kino-accent/20 rounded-full mb-4">
+                    <i class="fas fa-upload text-2xl text-kino-accent"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-2">Добавить фильм</h1>
+                <p class="text-kino-text-secondary text-sm">
+                    Введите TMDB ID фильма для добавления в вашу коллекцию
+                </p>
+            </div>
+            
+            <!-- Error Message -->
+            {% if error %}
+            <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-center gap-3">
+                <i class="fas fa-exclamation-circle text-red-500"></i>
+                <span class="text-red-400 text-sm">{{ error }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Movie Preview -->
+            {% if movie_data %}
+            <div class="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                <div class="flex gap-4">
+                    <img 
+                        src="https://image.tmdb.org/t/p/w200{{ movie_data.poster_path }}" 
+                        alt="{{ movie_data.title }}"
+                        class="w-20 h-28 object-cover rounded-lg"
+                        onerror="this.src='https://via.placeholder.com/200x300/1f1f1f/333333?text=Нет+постера'"
+                    >
+                    <div class="flex-1">
+                        <h3 class="text-white font-semibold mb-2">{{ movie_data.title }}</h3>
+                        <p class="text-kino-text-secondary text-sm line-clamp-3 mb-2">
+                            {{ movie_data.overview|truncatechars:150 }}
+                        </p>
+                        <div class="flex items-center gap-3 text-xs">
+                            {% if movie_data.vote_average %}
+                            <span class="px-2 py-1 rounded {% if movie_data.vote_average >= 7 %}bg-green-600{% elif movie_data.vote_average >= 5 %}bg-orange-500{% else %}bg-red-600{% endif %} text-white font-bold">
+                                <i class="fas fa-star mr-1"></i>{{ movie_data.vote_average|floatformat:1 }}
+                            </span>
+                            {% endif %}
+                            {% if movie_data.release_date %}
+                            <span class="text-gray-400">
+                                <i class="far fa-calendar-alt mr-1"></i>{{ movie_data.release_date|slice:":4" }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Form -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="tmdb_id" class="block text-sm font-medium text-gray-300 mb-2">
+                        TMDB ID фильма
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            id="tmdb_id" 
+                            name="tmdb_id" 
+                            value="{{ movie_data.id|default:'' }}"
+                            placeholder="Например: 550 (Бойцовский клуб)"
+                            class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-lg px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700 transition-all"
+                            required
+                        >
+                        <i class="fas fa-hashtag absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">
+                        Найдите ID фильма на сайте <a href="https://www.themoviedb.org/" target="_blank" class="text-kino-accent hover:underline">themoviedb.org</a>
+                    </p>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-kino-accent hover:bg-kino-accent-hover text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg shadow-kino-accent/20"
+                >
+                    <i class="fas fa-plus-circle"></i>
+                    Добавить в коллекцию
+                </button>
+            </form>
+            
+            <!-- Back Link -->
+            <div class="mt-6 text-center">
+                <a href="{% url 'home' %}" class="text-kino-text-secondary hover:text-kino-accent transition-colors text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Вернуться к поиску
+                </a>
+            </div>
+        </div>
+        
+        <!-- Help Tip -->
+        <div class="mt-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700 text-center">
+            <p class="text-gray-400 text-sm">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                Не знаете ID? Просто найдите фильм через поиск на главной странице
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
