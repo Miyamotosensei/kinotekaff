@@ -1,6 +1,10 @@
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,18 +14,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c4jn6=pds%f#s_-'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c4jn6=pds%f#s_-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['kinotekaff-production.up.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# CSRF Trusted Origins для вашего домена
+# CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = [
     'https://kinotekaff-production.up.railway.app',
     'http://localhost',
     'http://127.0.0.1',
+    'http://localhost:3000',
 ]
 
 
@@ -76,12 +81,18 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get('DATABASE_URL'):
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -122,7 +133,9 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Дополнительная директория для статики
+STATICFILES_DIRS = []
+# Раскомментируйте, если создадите папку static/
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # WhiteNoise настройки для раздачи статики
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -132,7 +145,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # TMDb
-TMDB_API_KEY = "c0c811e14b7d973d41c9c5bbb8d59a58"
+TMDB_API_KEY = os.environ.get('TMDB_API_KEY', '')
 
 # Auth settings
 LOGIN_REDIRECT_URL = 'home'
