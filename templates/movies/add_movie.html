@@ -141,6 +141,30 @@
                         {% endif %}
                     </div>
 
+                    <!-- Video URL Field -->
+                    <div>
+                        <label for="id_video_url" class="block text-white font-semibold mb-2">
+                            <i class="fas fa-link text-kino-accent mr-2"></i>
+                            URL видео (iframe)
+                        </label>
+                        {{ form.video_url }}
+                        <p class="text-gray-500 text-sm mt-1">Или вставьте ссылку на видео (например, YouTube embed)</p>
+                        {% if form.video_url.errors %}
+                            <div class="text-red-500 text-sm mt-1">
+                                {% for error in form.video_url.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg p-4">
+                        <p class="text-blue-300 text-sm flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i>
+                            <span>Заполните либо поле "Видеофайл", либо "URL видео". Приоритет у видеофайла.</span>
+                        </p>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="flex gap-4 pt-6 border-t border-gray-700">
                         <button 

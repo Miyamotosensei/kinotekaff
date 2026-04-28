@@ -36,6 +36,9 @@ class Movie(models.Model):
     # Поле для загрузки видеофайла
     video_file = models.FileField(upload_to='videos/', null=True, blank=True)
     
+    # Поле для URL видео (iframe)
+    video_url = models.URLField(blank=True, null=True, help_text="URL для вставки видео через iframe")
+    
     # Автор фильма (пользователь, который загрузил)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='movies')
 

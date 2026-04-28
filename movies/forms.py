@@ -39,7 +39,7 @@ class RatingForm(forms.ModelForm):
 class MovieUploadForm(forms.ModelForm):
     class Meta:
         model = Movie
-        fields = ['title', 'description', 'genre', 'year', 'poster_file', 'video_file']
+        fields = ['title', 'description', 'genre', 'year', 'poster_file', 'video_file', 'video_url']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 rounded-lg bg-kino-card border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-kino-accent',
@@ -64,6 +64,10 @@ class MovieUploadForm(forms.ModelForm):
             'video_file': forms.FileInput(attrs={
                 'class': 'w-full px-4 py-2 rounded-lg bg-kino-card border border-gray-700 text-gray-400 focus:outline-none focus:border-kino-accent',
                 'accept': 'video/*'
+            }),
+            'video_url': forms.URLInput(attrs={
+                'class': 'w-full px-4 py-2 rounded-lg bg-kino-card border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-kino-accent',
+                'placeholder': 'URL видео (например, https://www.youtube.com/embed/...)'
             })
         }
         labels = {
@@ -72,5 +76,6 @@ class MovieUploadForm(forms.ModelForm):
             'genre': 'Жанр',
             'year': 'Год выпуска',
             'poster_file': 'Постер фильма',
-            'video_file': 'Видеофайл'
+            'video_file': 'Видеофайл',
+            'video_url': 'URL видео (iframe)'
         }

@@ -17,6 +17,15 @@
                 <source src="{{ movie.video_file.url }}" type="video/mp4">
                 Ваш браузер не поддерживает HTML5 видео.
             </video>
+        {% elif movie.video_url %}
+            <iframe 
+                id="moviePlayer"
+                class="w-full aspect-video bg-black border-0"
+                src="{{ movie.video_url }}"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+            ></iframe>
         {% else %}
             <div class="w-full aspect-video bg-gradient-to-br from-kino-card to-black flex items-center justify-center">
                 <div class="text-center">
@@ -160,6 +169,7 @@
                 </div>
 
                 <script>
+                    // Rating stars handling
                     document.querySelectorAll('.star-button').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const rating = this.dataset.rating;
@@ -174,6 +184,72 @@
                                 }
                             });
                         });
+                    });
+
+                    // AJAX form submission for rating
+                    document.getElementById('ratingForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+                        
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update rating display
+                                location.reload();
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+
+                    // AJAX form submission for comments
+                    document.getElementById('commentForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+                        
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Add comment to list
+                                const commentsList = document.getElementById('commentsList');
+                                const emptyState = commentsList.querySelector('.text-center');
+                                if (emptyState) {
+                                    emptyState.remove();
+                                }
+                                
+                                const commentHtml = `
+                                    <div class="bg-kino-card rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div>
+                                                <h4 class="text-white font-semibold">${data.comment.user}</h4>
+                                                <p class="text-gray-500 text-sm">${data.comment.created_at}</p>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-300 leading-relaxed">${data.comment.text}</p>
+                                    </div>
+                                `;
+                                commentsList.insertAdjacentHTML('afterbegin', commentHtml);
+                                
+                                // Clear form
+                                this.reset();
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
                     });
                 </script>
                 {% else %}
