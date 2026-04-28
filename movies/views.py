@@ -187,8 +187,4 @@ def import_movie(request, tmdb_id):
             defaults={'status': 'planned'}
         )
 
-<<<<<<< HEAD
     return redirect('home')
-=======
-    return redirect('search')
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
