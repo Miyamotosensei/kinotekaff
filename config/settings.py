@@ -21,12 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c5c4jn6=pds%f#s_-'
+SECRET_KEY = 'django-insecure-cy511rio(na+a$&d%x=i6b)=+4t(4gh9&c4jn6=pds%f#s_-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['kinotekaff-production.up.railway.app', 'localhost', '127.0.0.1']
+
+# CSRF Trusted Origins для вашего домена
+CSRF_TRUSTED_ORIGINS = [
+    'https://kinotekaff-production.up.railway.app',
+    'http://localhost',
+    'http://127.0.0.1',
+]
 
 
 # Application definition
@@ -38,12 +45,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Сторонние приложения
+    'whitenoise.runserver_nostatic',  # WhiteNoise для раздачи статики
+    # Локальные приложения
     'movies',
     'submissions',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise middleware для раздачи статики
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -121,6 +133,10 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Дополнительная директория для статики
+
+# WhiteNoise настройки для раздачи статики
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
