@@ -1,8 +1,25 @@
-from django.shortcuts import render
-
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .tmdb import search_movies, get_movie
 from .models import Movie, UserMovie
+
+
+def home(request):
+    """Главная страница с популярными фильмами"""
+    # Получаем популярные фильмы из TMDB
+    data = search_movies('popular') or {}
+    results = data.get('results', [])[:12]  # Берем первые 12 фильмов
+    
+    # Если есть запрос поиска, обрабатываем его
+    query = request.GET.get('q')
+    if query and query != 'popular':
+        data = search_movies(query)
+        results = data.get('results', [])[:12] if data else []
+    
+    context = {
+        'movies': results,
+        'query': query,
+    }
+    return render(request, 'movies/index.html', context)
 
 
 def search_view(request):
@@ -37,4 +54,4 @@ def import_movie(request, tmdb_id):
             defaults={'status': 'planned'}
         )
 
-    return redirect('search')
+    return redirect('home')

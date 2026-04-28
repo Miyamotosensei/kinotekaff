@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация - Кинотека{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 relative overflow-hidden">
+    <!-- Background Blur Effect -->
+    <div class="absolute inset-0 bg-gradient-to-br from-kino-accent/10 to-purple-900/10 blur-3xl"></div>
+    
+    <div class="w-full max-w-md relative z-10">
+        <!-- Card -->
+        <div class="bg-kino-card rounded-2xl shadow-2xl p-8 border border-gray-800 backdrop-blur-sm">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-kino-accent/20 rounded-full mb-4">
+                    <i class="fas fa-user-plus text-2xl text-kino-accent"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-2">Создать аккаунт</h1>
+                <p class="text-kino-text-secondary text-sm">
+                    Присоединяйтесь к Кинотеке прямо сейчас
+                </p>
+            </div>
+            
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-3">
+                <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                <div class="text-red-400 text-sm">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p class="mb-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Form -->
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-user mr-2 text-kino-accent"></i>Имя пользователя
+                    </label>
+                    <input 
+                        type="text" 
+                        id="id_username" 
+                        name="username" 
+                        autocomplete="username"
+                        placeholder="Придумайте имя пользователя"
+                        class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700 transition-all"
+                        required
+                    >
+                    <p class="mt-1 text-xs text-gray-500">Только латинские буквы, цифры и символы</p>
+                </div>
+                
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-envelope mr-2 text-kino-accent"></i>Email
+                    </label>
+                    <input 
+                        type="email" 
+                        id="id_email" 
+                        name="email" 
+                        autocomplete="email"
+                        placeholder="your@email.com"
+                        class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700 transition-all"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2 text-kino-accent"></i>Пароль
+                    </label>
+                    <input 
+                        type="password" 
+                        id="id_password1" 
+                        name="password1" 
+                        autocomplete="new-password"
+                        placeholder="Придумайте надёжный пароль"
+                        class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700 transition-all"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2 text-kino-accent"></i>Подтверждение пароля
+                    </label>
+                    <input 
+                        type="password" 
+                        id="id_password2" 
+                        name="password2" 
+                        autocomplete="new-password"
+                        placeholder="Повторите пароль"
+                        class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700 transition-all"
+                        required
+                    >
+                </div>
+                
+                <div class="flex items-start gap-2 text-sm">
+                    <input type="checkbox" id="id_terms" name="terms" class="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-kino-accent focus:ring-kino-accent focus:ring-offset-0" required>
+                    <label for="id_terms" class="text-gray-400 cursor-pointer">
+                        Я согласен с <a href="#" class="text-kino-accent hover:underline">условиями использования</a> и <a href="#" class="text-kino-accent hover:underline">политикой конфиденциальности</a>
+                    </label>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-kino-accent hover:bg-kino-accent-hover text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg shadow-kino-accent/20"
+                >
+                    <i class="fas fa-user-plus"></i>
+                    Зарегистрироваться
+                </button>
+            </form>
+            
+            <!-- Divider -->
+            <div class="my-6 flex items-center gap-4">
+                <div class="flex-1 h-px bg-gray-700"></div>
+                <span class="text-gray-500 text-sm">или</span>
+                <div class="flex-1 h-px bg-gray-700"></div>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="text-gray-400 text-sm mb-3">Уже есть аккаунт?</p>
+                <a href="{% url 'login' %}" class="inline-flex items-center gap-2 text-kino-accent hover:text-kino-accent-hover transition-colors font-medium">
+                    Войти
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Back Link -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'home' %}" class="text-kino-text-secondary hover:text-kino-accent transition-colors text-sm">
+                <i class="fas fa-home mr-2"></i>На главную
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
