@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-<<<<<<< HEAD
 {% block title %}Загрузить фильм{% endblock %}
 
 {% block content %}
@@ -101,59 +100,3 @@
     manualRadio.addEventListener('change', toggleFields);
 </script>
 {% endblock %}
-=======
-{% block title %}Загрузить фильм - Кинотека{% endblock %}
-
-{% block content %}
-<div class="form-container py-5">
-    <div class="form-card">
-        <h2 class="form-title">Загрузить фильм</h2>
-        
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            {% for field in form %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">
-                        {{ field.label }}
-                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                    </label>
-                    
-                    {% if field.field.widget.input_type == 'file' %}
-                        <input type="file" 
-                               name="{{ field.name }}" 
-                               id="{{ field.id_for_label }}"
-                               class="form-control"
-                               {% if field.field.required %}required{% endif %}>
-                    {% elif field.field.widget.input_type == 'textarea' %}
-                        <textarea name="{{ field.name }}" 
-                                  id="{{ field.id_for_label }}"
-                                  class="form-control"
-                                  placeholder="Введите {{ field.label|lower }}..."
-                                  {% if field.field.required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
-                    {% else %}
-                        <input type="{{ field.field.widget.input_type }}" 
-                               name="{{ field.name }}" 
-                               id="{{ field.id_for_label }}"
-                               class="form-control"
-                               placeholder="Введите {{ field.label|lower }}..."
-                               value="{{ field.value|default:'' }}"
-                               {% if field.field.required %}required{% endif %}>
-                    {% endif %}
-                    
-                    {% if field.help_text %}
-                        <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
-                    {% endif %}
-                    
-                    {% for error in field.errors %}
-                        <div class="text-danger small mt-1">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            
-            <button type="submit" class="btn btn-orange btn-full mt-3">Опубликовать</button>
-        </form>
-    </div>
-</div>
-{% endblock %}
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f

@@ -1,25 +1,14 @@
-<<<<<<< HEAD
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import MovieSubmissionForm
 from django.contrib.auth.decorators import login_required
 from movies.models import Movie, UserMovie
 from movies.tmdb import get_movie
-=======
-from django.shortcuts import render, redirect
-from .forms import MovieSubmissionForm
-from django.contrib.auth.decorators import login_required
-from movies.models import Movie
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 @login_required
 def submit_movie(request):
     if request.method == 'POST':
-<<<<<<< HEAD
         form = MovieSubmissionForm(request.POST)
-=======
-        form = MovieSubmissionForm(request.POST, request.FILES)
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
         if form.is_valid():
             sub = form.save(commit=False)
             sub.user = request.user
@@ -28,7 +17,6 @@ def submit_movie(request):
     else:
         form = MovieSubmissionForm()
 
-<<<<<<< HEAD
     return render(request, 'submissions/form.html', {'form': form})
 
 
@@ -72,14 +60,10 @@ def upload_movie(request):
         'movie_data': movie_data,
         'error': error,
     })
-=======
-    return render(request, 'submissions/upload_movie.html', {'form': form})
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 @login_required
 def profile_view(request):
-<<<<<<< HEAD
     """Профиль пользователя с его фильмами"""
     user_movies = UserMovie.objects.filter(user=request.user).select_related('movie')
     
@@ -87,14 +71,3 @@ def profile_view(request):
         'user_movies': user_movies,
     }
     return render(request, 'submissions/profile.html', context)
-=======
-    """Страница профиля пользователя"""
-    movies = Movie.objects.filter(usermovie__user=request.user).select_related('usermovie')
-    
-    context = {
-        'movies': movies,
-        'favorites': [],  # Можно добавить функционал избранного
-    }
-    
-    return render(request, 'movies/profile.html', context)
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f

@@ -1,5 +1,4 @@
 from django.contrib import admin
-<<<<<<< HEAD
 from .models import Movie, Comment, Rating, UserMovie
 
 
@@ -48,7 +47,3 @@ class UserMovieAdmin(admin.ModelAdmin):
     list_display = ('user', 'movie', 'status')
     list_filter = ('status',)
     search_fields = ('user__username', 'movie__title')
-=======
-
-# Register your models here.
->>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
