@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить фильм{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-gray-800 p-8 rounded-xl shadow-2xl mt-10">
+    <h1 class="text-2xl font-bold mb-6 text-center text-white">Добавить фильм в коллекцию</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Переключатель источника -->
+        <div class="flex justify-center gap-6 mb-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="source_type" value="tmdb" checked class="form-radio text-orange-500 focus:ring-orange-500">
+                <span class="text-gray-300">Импорт из TMDB</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="source_type" value="manual" class="form-radio text-orange-500 focus:ring-orange-500">
+                <span class="text-gray-300">Добавить вручную</span>
+            </label>
+        </div>
+
+        <!-- Поля для TMDB -->
+        <div id="tmdb-fields">
+            <div>
+                <label class="block text-gray-300 mb-2">TMDB ID</label>
+                <input type="number" name="tmdb_id" class="w-full bg-gray-700 border border-gray-600 rounded-lg py-3 px-4 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Например: 550">
+                <p class="text-xs text-gray-500 mt-1">Введите ID фильма с сайта themoviedb.org</p>
+            </div>
+        </div>
+
+        <!-- Поля для ручного добавления (скрыты по умолчанию) -->
+        <div id="manual-fields" class="hidden space-y-4">
+            <div>
+                <label class="block text-gray-300 mb-2">Название фильма</label>
+                <input type="text" name="title" class="w-full bg-gray-700 border border-gray-600 rounded-lg py-3 px-4 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 mb-2">Описание</label>
+                <textarea name="description" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded-lg py-3 px-4 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-300 mb-2">Постер</label>
+                    <input type="file" name="poster" accept="image/*" class="w-full text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700">
+                </div>
+                <div>
+                    <label class="block text-gray-300 mb-2">Видео файл</label>
+                    <input type="file" name="video_file" accept="video/*" class="w-full text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 mb-2">Или ссылка на видео (iframe/url)</label>
+                <input type="url" name="video_url" class="w-full bg-gray-700 border border-gray-600 rounded-lg py-3 px-4 text-white focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="https://...">
+            </div>
+            
+            <div>
+                <label class="block text-gray-300 mb-2">Жанры</label>
+                <!-- Здесь нужно вывести чекбоксы из формы Django -->
+                <div class="flex flex-wrap gap-2">
+                    {% for field in form.genres %}
+                        <label class="flex items-center gap-2 bg-gray-700 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-600">
+                            {{ field.tag }} <!-- Если используется django-taggit или аналогичное, иначе стандартный input -->
+                            <span class="text-gray-300 text-sm">{{ field.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                     <!-- Упрощенный вариант, если form.as_p не подходит для кастомизации -->
+                     {{ form.genres }}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-lg text-lg transition duration-300 shadow-lg shadow-orange-500/30">
+            Опубликовать фильм
+        </button>
+    </form>
+</div>
+
+<script>
+    const tmdbRadio = document.querySelector('input[name="source_type"][value="tmdb"]');
+    const manualRadio = document.querySelector('input[name="source_type"][value="manual"]');
+    const tmdbFields = document.getElementById('tmdb-fields');
+    const manualFields = document.getElementById('manual-fields');
+
+    function toggleFields() {
+        if (tmdbRadio.checked) {
+            tmdbFields.classList.remove('hidden');
+            manualFields.classList.add('hidden');
+        } else {
+            tmdbFields.classList.add('hidden');
+            manualFields.classList.remove('hidden');
+        }
+    }
+
+    tmdbRadio.addEventListener('change', toggleFields);
+    manualRadio.addEventListener('change', toggleFields);
+</script>
+{% endblock %}
