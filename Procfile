@@ -1,1 +1,1 @@
-web: gunicorn kinoteka.wsgi
+web: gunicorn config.wsgi
