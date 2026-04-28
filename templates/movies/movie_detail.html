@@ -4,100 +4,384 @@
 {% block title %}{{ movie.title }} - Кинотека{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-kino-bg">
-    <!-- Video Player Section -->
-    <div class="relative bg-black">
-        {% if movie.video_file %}
-            <video 
-                id="moviePlayer" 
-                class="w-full aspect-video bg-black"
-                controls
-                controlsList="nodownload"
-            >
-                <source src="{{ movie.video_file.url }}" type="video/mp4">
-                Ваш браузер не поддерживает HTML5 видео.
-            </video>
-        {% else %}
-            <div class="w-full aspect-video bg-gradient-to-br from-kino-card to-black flex items-center justify-center">
-                <div class="text-center">
-                    <i class="fas fa-film text-6xl text-gray-600 mb-4"></i>
-                    <p class="text-gray-500">Видео недоступно</p>
-                </div>
+<!-- Modern Video Player Section -->
+<div class="relative bg-black">
+    {% if movie.iframe_url %}
+        <!-- Iframe Player -->
+        <div class="w-full aspect-video">
+            <iframe 
+                src="{{ movie.iframe_url }}" 
+                class="w-full h-full"
+                frameborder="0"
+                allowfullscreen
+                allow="autoplay; fullscreen"
+            ></iframe>
+        </div>
+    {% elif movie.video_file %}
+        <!-- Local Video File -->
+        <video 
+            id="moviePlayer" 
+            class="w-full aspect-video bg-black"
+            controls
+            controlsList="nodownload"
+            poster="{% if movie.poster_file %}{{ movie.poster_file.url }}{% elif movie.poster %}{{ movie.poster }}{% endif %}"
+        >
+            <source src="{{ movie.video_file.url }}" type="video/mp4">
+            Ваш браузер не поддерживает HTML5 видео.
+        </video>
+    {% else %}
+        <!-- No Video Placeholder -->
+        <div class="w-full aspect-video bg-gradient-to-br from-kino-card to-black flex items-center justify-center relative overflow-hidden">
+            {% if movie.poster %}
+                <img src="{{ movie.poster }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm">
+            {% endif %}
+            <div class="relative z-10 text-center px-4">
+                <i class="fas fa-film text-6xl text-gray-600 mb-4"></i>
+                <p class="text-gray-400 text-lg mb-2">Видео недоступно</p>
+                {% if user.is_authenticated and user == movie.author %}
+                    <a href="#" class="text-kino-accent hover:text-kino-accent-hover text-sm mt-2 inline-block">
+                        <i class="fas fa-edit mr-1"></i>Редактировать фильм
+                    </a>
+                {% endif %}
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kino-bg to-transparent pointer-events-none"></div>
+</div>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Movie Info Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <!-- Left Column: Poster & Stats -->
-            <div class="md:col-span-1">
+<div class="container mx-auto px-4 py-8 -mt-16 relative z-10">
+    <!-- Movie Header Info -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+        <!-- Left Column: Poster -->
+        <div class="lg:col-span-1">
+            <div class="bg-kino-card rounded-2xl p-4 shadow-2xl border border-gray-800 sticky top-24">
                 {% if movie.poster_file %}
                     <img 
                         src="{{ movie.poster_file.url }}" 
                         alt="{{ movie.title }}"
-                        class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow"
+                        class="w-full rounded-xl shadow-lg hover:shadow-2xl transition-shadow"
                     >
                 {% elif movie.poster %}
                     <img 
                         src="{{ movie.poster }}" 
                         alt="{{ movie.title }}"
-                        class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow"
-                        onerror="this.src='https://via.placeholder.com/300x450/1f1f1f/666666?text=Постер'"
+                        class="w-full rounded-xl shadow-lg hover:shadow-2xl transition-shadow"
+                        onerror="this.src='https://via.placeholder.com/300x450/1a1a1a/666666?text=Постер'"
                     >
                 {% else %}
-                    <div class="w-full aspect-[2/3] bg-kino-card rounded-lg mb-6 flex items-center justify-center">
-                        <i class="fas fa-image text-4xl text-gray-600"></i>
+                    <div class="w-full aspect-[2/3] bg-gradient-to-br from-kino-card to-gray-900 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-image text-5xl text-gray-600"></i>
                     </div>
                 {% endif %}
 
-                <!-- Stats Box -->
-                <div class="bg-kino-card rounded-lg p-4 space-y-3">
-                    <!-- Rating -->
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Рейтинг:</span>
+                <!-- Rating Box -->
+                <div class="mt-4 bg-gray-800/50 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-gray-400 text-sm">Рейтинг:</span>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-star text-kino-accent"></i>
-                            <span class="text-white font-bold text-lg">{{ avg_rating }}/10</span>
+                            <span class="text-white font-bold text-xl">{{ avg_rating }}</span>
+                            <span class="text-gray-500 text-sm">/10</span>
                         </div>
                     </div>
                     
-                    <!-- Rating Count -->
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-400">Оценок:</span>
-                        <span class="text-white">{{ rating_count }}</span>
-                    </div>
-
-                    <!-- Year -->
-                    {% if movie.year %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Год:</span>
-                        <span class="text-white">{{ movie.year }}</span>
-                    </div>
+                    {% if user.is_authenticated %}
+                        {% if user_rating %}
+                            <div class="text-center py-2 px-3 bg-green-600/20 border border-green-600/30 rounded-lg">
+                                <p class="text-green-400 text-xs">Ваша оценка: <span class="font-bold">{{ user_rating.rating }}/10</span></p>
+                            </div>
+                        {% else %}
+                            <form method="post" class="space-y-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="rating_submit" value="1">
+                                {{ rating_form.rating }}
+                                <button type="submit" class="w-full bg-kino-accent hover:bg-kino-accent-hover text-white py-2 rounded-lg text-sm font-semibold transition-colors">
+                                    <i class="fas fa-star mr-1"></i>Оценить
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-gray-500 text-xs text-center">
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="text-kino-accent hover:underline">Войдите</a>, чтобы оценить
+                        </p>
                     {% endif %}
+                    
+                    <p class="text-gray-500 text-xs text-center mt-2">
+                        {{ rating_count }} оценок
+                    </p>
+                </div>
 
-                    <!-- Genre -->
-                    {% if movie.genre %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Жанр:</span>
-                        <span class="text-white">
-                            <a href="?genre={{ movie.genre }}" class="hover:text-kino-accent transition-colors">
-                                {{ movie.get_genre_display }}
-                            </a>
+                <!-- Action Buttons -->
+                <div class="mt-4 space-y-2">
+                    {% if user.is_authenticated %}
+                        <button class="w-full bg-gray-800 hover:bg-gray-700 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 border border-gray-700">
+                            <i class="fas fa-plus"></i>
+                            В список
+                        </button>
+                        <button class="w-full bg-gray-800 hover:bg-gray-700 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 border border-gray-700">
+                            <i class="fas fa-share-alt"></i>
+                            Поделиться
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Info & Tabs -->
+        <div class="lg:col-span-3">
+            <!-- Title & Meta -->
+            <div class="mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{{ movie.title }}</h1>
+                
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    {% if movie.category %}
+                        <span class="px-3 py-1.5 rounded-lg bg-kino-accent text-white text-sm font-semibold">
+                            {{ movie.get_category_display }}
                         </span>
-                    </div>
                     {% endif %}
-
-                    <!-- Author -->
-                    {% if movie.author %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Автор:</span>
-                        <span class="text-white">{{ movie.author.username }}</span>
-                    </div>
+                    
+                    {% if movie.year %}
+                        <span class="flex items-center gap-1.5 text-gray-400">
+                            <i class="far fa-calendar-alt"></i>
+                            {{ movie.year }}
+                        </span>
                     {% endif %}
+                    
+                    {% if movie.quality %}
+                        <span class="px-2.5 py-1 rounded bg-gradient-to-r from-kino-accent to-orange-600 text-white text-xs font-bold">
+                            {{ movie.quality }}
+                        </span>
+                    {% endif %}
+                    
+                    {% if movie.views_count %}
+                        <span class="flex items-center gap-1.5 text-gray-400">
+                            <i class="fas fa-eye"></i>
+                            {{ movie.views_count }}
+                        </span>
+                    {% endif %}
+                    
+                    {% if movie.source == 'user' and movie.author %}
+                        <span class="flex items-center gap-1.5 text-gray-400">
+                            <i class="fas fa-user"></i>
+                            {{ movie.author.username }}
+                        </span>
+                    {% endif %}
+                </div>
 
-                    <!-- Source -->
-                    <div class="flex items-center justify-between">
+                <!-- Genres -->
+                {% if movie.genres.exists %}
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {% for genre in movie.genres.all %}
+                            <a href="?genre={{ genre.slug }}" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-kino-accent text-gray-300 hover:text-white text-sm transition-colors border border-gray-700">
+                                {{ genre.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Description -->
+                {% if movie.description %}
+                    <div class="prose prose-invert max-w-none">
+                        <p class="text-gray-300 leading-relaxed">{{ movie.description|linebreaksbr }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Tabs Section -->
+            <div class="bg-kino-card rounded-2xl border border-gray-800 overflow-hidden">
+                <!-- Tab Headers -->
+                <div class="flex border-b border-gray-800">
+                    <button class="tab-btn active flex-1 px-6 py-4 text-center font-semibold text-kino-accent border-b-2 border-kino-accent bg-kino-accent/5 transition-colors" data-tab="description">
+                        <i class="fas fa-align-left mr-2"></i>Описание
+                    </button>
+                    <button class="tab-btn flex-1 px-6 py-4 text-center font-semibold text-gray-400 hover:text-white transition-colors" data-tab="cast">
+                        <i class="fas fa-users mr-2"></i>Актеры
+                    </button>
+                    <button class="tab-btn flex-1 px-6 py-4 text-center font-semibold text-gray-400 hover:text-white transition-colors" data-tab="reviews">
+                        <i class="fas fa-comments mr-2"></i>Отзывы ({{ comments.count }})
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="p-6">
+                    <!-- Description Tab -->
+                    <div id="description-tab" class="tab-content active">
+                        <h3 class="text-xl font-semibold text-white mb-4">О фильме</h3>
+                        <div class="space-y-4 text-gray-300">
+                            {% if movie.description %}
+                                <p>{{ movie.description|linebreaks }}</p>
+                            {% else %}
+                                <p class="text-gray-500 italic">Описание отсутствует</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Cast Tab -->
+                    <div id="cast-tab" class="tab-content hidden">
+                        <h3 class="text-xl font-semibold text-white mb-4">В ролях</h3>
+                        <p class="text-gray-500 italic">Информация об актёрах скоро появится</p>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div id="reviews-tab" class="tab-content hidden">
+                        <h3 class="text-xl font-semibold text-white mb-6">Отзывы пользователей</h3>
+                        
+                        <!-- Add Comment Form -->
+                        {% if user.is_authenticated %}
+                            <form method="post" class="mb-8 pb-8 border-b border-gray-800">
+                                {% csrf_token %}
+                                <input type="hidden" name="comment_submit" value="1">
+                                <div class="space-y-3">
+                                    {{ comment_form.text }}
+                                    {% if comment_form.text.errors %}
+                                        <p class="text-red-400 text-sm">{{ comment_form.text.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="mt-4 bg-kino-accent hover:bg-kino-accent-hover text-white px-6 py-2.5 rounded-xl font-semibold transition-colors flex items-center gap-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Опубликовать отзыв
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="mb-8 p-4 bg-gray-800/50 rounded-xl text-center">
+                                <p class="text-gray-400">
+                                    <a href="{% url 'login' %}?next={{ request.path }}" class="text-kino-accent hover:underline font-semibold">Войдите</a>, чтобы оставить отзыв
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Comments List -->
+                        <div class="space-y-4">
+                            {% if comments %}
+                                {% for comment in comments %}
+                                    <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div class="flex items-center gap-3">
+                                                {% if comment.user.avatar %}
+                                                    <img src="{{ comment.user.avatar.url }}" alt="{{ comment.user.username }}" class="w-10 h-10 rounded-full object-cover">
+                                                {% else %}
+                                                    <div class="w-10 h-10 rounded-full bg-kino-accent flex items-center justify-center text-white font-bold">
+                                                        {{ comment.user.username|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <p class="text-white font-semibold">{{ comment.user.username }}</p>
+                                                    <p class="text-gray-500 text-xs">{{ comment.created_at|date:"d.m.Y H:i" }}</p>
+                                                </div>
+                                            </div>
+                                            {% if user == comment.user %}
+                                                <a href="{% url 'delete_comment' comment.id %}" class="text-gray-500 hover:text-red-400 transition-colors" title="Удалить">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-gray-300">{{ comment.text|linebreaks }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-12">
+                                    <i class="fas fa-comment-slash text-5xl text-gray-700 mb-4"></i>
+                                    <p class="text-gray-500">Пока нет отзывов. Будьте первым!</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Movies -->
+            {% if similar_movies %}
+                <div class="mt-12">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fas fa-fire text-kino-accent"></i>
+                        Похожие фильмы
+                    </h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {% for similar in similar_movies %}
+                            <a href="{% url 'movie_detail' similar.id %}" class="group">
+                                <div class="rounded-xl overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-orange-500/10">
+                                    <div class="relative aspect-[2/3] overflow-hidden bg-gradient-to-br from-kino-card to-gray-900">
+                                        {% if similar.poster_file %}
+                                            <img src="{{ similar.poster_file.url }}" alt="{{ similar.title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                                        {% elif similar.poster %}
+                                            <img src="{{ similar.poster }}" alt="{{ similar.title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <i class="fas fa-film text-3xl text-gray-600"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        
+                                        {% if similar.get_average_rating %}
+                                            <div class="absolute top-2 left-2 px-2 py-1 rounded-lg bg-kino-accent text-white text-xs font-bold">
+                                                <i class="fas fa-star mr-1"></i>{{ similar.get_average_rating }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="p-3 bg-kino-card">
+                                        <h3 class="text-white font-semibold text-sm truncate">{{ similar.title }}</h3>
+                                        <p class="text-gray-500 text-xs mt-1">
+                                            {% if similar.year %}{{ similar.year }}{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Back Button -->
+<a href="{% url 'home' %}" class="fixed bottom-6 right-6 bg-kino-accent hover:bg-kino-accent-hover text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all transform hover:scale-110 z-50">
+    <i class="fas fa-arrow-up"></i>
+</a>
+
+<style>
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    // Tab functionality
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            
+            // Remove active class from all buttons and contents
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active', 'text-kino-accent', 'border-b-2', 'border-kino-accent', 'bg-kino-accent/5');
+                b.classList.add('text-gray-400');
+            });
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.classList.add('hidden');
+            });
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active', 'text-kino-accent', 'border-b-2', 'border-kino-accent', 'bg-kino-accent/5');
+            this.classList.remove('text-gray-400');
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        });
+    });
+</script>
+{% endblock %}
                         <span class="text-gray-400">Источник:</span>
                         <span class="text-white text-sm">
                             {% if movie.source == 'tmdb' %}
