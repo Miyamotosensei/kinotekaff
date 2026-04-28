@@ -66,11 +66,9 @@
                     <div class="movie-card group">
                         <div class="relative aspect-[2/3] overflow-hidden rounded-xl bg-kino-card">
                             {% if movie.poster_path %}
-                                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onerror="this.src='https://via.placeholder.com/300x450/1a1a1a/666666?text=Нет+постера'">
                             {% else %}
-                                <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                                    <i class="fas fa-image text-4xl text-gray-600"></i>
-                                </div>
+                                <img src="https://via.placeholder.com/300x450/1a1a1a/666666?text=Нет+постера" alt="{{ movie.title }}" class="w-full h-full object-cover">
                             {% endif %}
                         </div>
                         <div class="p-3 mt-2">

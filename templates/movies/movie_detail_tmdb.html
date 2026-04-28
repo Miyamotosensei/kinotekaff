@@ -28,11 +28,14 @@
                         src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
                         alt="{{ movie.title }}"
                         class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow"
+                        onerror="this.src='https://via.placeholder.com/300x450/1a1a1a/666666?text=Нет+постера'"
                     >
                 {% else %}
-                    <div class="w-full aspect-[2/3] bg-kino-card rounded-lg mb-6 flex items-center justify-center">
-                        <i class="fas fa-image text-4xl text-gray-600"></i>
-                    </div>
+                    <img 
+                        src="https://via.placeholder.com/300x450/1a1a1a/666666?text=Нет+постера" 
+                        alt="{{ movie.title }}"
+                        class="w-full rounded-lg mb-6 shadow-xl"
+                    >
                 {% endif %}
 
                 <!-- Stats Box -->
