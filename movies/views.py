@@ -2,70 +2,88 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count
+from django.core.paginator import Paginator
 from .tmdb import search_movies, get_movie, get_popular_movies, get_movie_videos, search_by_genre, get_genres
-from .models import Movie, UserMovie, Comment, Rating
+from .models import Movie, UserMovie, Comment, Rating, Genre
 from .forms import CommentForm, RatingForm, MovieUploadForm
 
 
 def home(request):
-    """Главная страница с популярными фильмами"""
-    # Получаем локальные фильмы
-    movies = Movie.objects.all()
-    tmdb_movies = []
+    """Главная страница с фильтрацией и сортировкой"""
+    # Получаем все фильмы с оптимизацией
+    movies = Movie.objects.select_related('author').prefetch_related('genres').all()
     
     # Фильтрация по жанру
     genre = request.GET.get('genre')
     if genre:
-        movies = movies.filter(genre=genre)
+        try:
+            genre_obj = Genre.objects.get(slug=genre)
+            movies = movies.filter(genres=genre_obj)
+        except Genre.DoesNotExist:
+            pass
+    
+    # Фильтрация по категории
+    category = request.GET.get('category')
+    if category:
+        movies = movies.filter(category=category)
+    
+    # Фильтрация по году
+    year = request.GET.get('year')
+    if year:
+        movies = movies.filter(year=year)
     
     # Сортировка
     sort = request.GET.get('sort', '-created_at')
     if sort == 'rating':
-        movies = sorted(movies, key=lambda m: m.get_average_rating(), reverse=True)
+        # Сортировка по рейтингу через аннотацию
+        movies = movies.annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')
     elif sort == 'title':
         movies = movies.order_by('title')
+    elif sort == 'year':
+        movies = movies.order_by('-year')
+    elif sort == 'views':
+        movies = movies.order_by('-views_count')
     else:  # По умолчанию новые
         movies = movies.order_by('-created_at')
     
     # Поиск
     query = request.GET.get('q')
     if query:
-        movies = movies.filter(Q(title__icontains=query) | Q(description__icontains=query))
+        movies = movies.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
         # Если это поиск, добавляем результаты из TMDB
-        if isinstance(movies, list):
-            pass
-        else:
-            tmdb_data = search_movies(query) or {}
-            tmdb_results = tmdb_data.get('results', [])[:6]
-            movies_list = list(movies)[:12]
-            context = {
-                'movies': movies_list,
-                'tmdb_movies': tmdb_results,
-                'query': query,
-                'sort': sort,
-                'genre': genre,
-                'genres': Movie.GENRE_CHOICES,
-            }
-            return render(request, 'movies/index.html', context)
+        tmdb_data = search_movies(query) or {}
+        tmdb_results = tmdb_data.get('results', [])[:6]
+    else:
+        tmdb_results = []
     
-    if not isinstance(movies, list):
-        movies = list(movies[:12])
+    # Пагинация
+    paginator = Paginator(movies, 12)
+    page_number = request.GET.get('page', 1)
+    movies_page = paginator.get_page(page_number)
     
-    # Если нет локальных фильмов, получаем популярные из TMDB
-    if not movies:
-        tmdb_data = get_popular_movies()
-        if tmdb_data and tmdb_data.get('results'):
-            tmdb_movies = tmdb_data.get('results', [])[:12]
+    # Получаем жанры для фильтра
+    genres = Genre.objects.all()
+    
+    # Получаем годы для фильтра
+    years = Movie.objects.values_list('year', flat=True).distinct().order_by('-year')
+    
+    # Hero movie - первый фильм для главного баннера
+    hero_movie = movies_page[0] if movies_page else None
     
     context = {
-        'movies': movies,
-        'tmdb_movies': tmdb_movies,
+        'movies': movies_page,
+        'tmdb_movies': tmdb_results,
         'query': query,
         'sort': sort,
         'genre': genre,
-        'genres': Movie.GENRE_CHOICES,
+        'category': category,
+        'year': year,
+        'genres': genres,
+        'years': years,
+        'hero_movie': hero_movie,
     }
     return render(request, 'movies/index.html', context)
 
@@ -80,19 +98,34 @@ def movie_detail_tmdb(request, tmdb_id):
     # Получаем трейлер
     trailer_key = get_movie_videos(tmdb_id)
     
+    # Получаем похожие фильмы из TMDB
+    similar_movies = []
+    # Можно добавить вызов API для похожих фильмов
+    
     context = {
         'movie': movie_data,
         'trailer_key': trailer_key,
         'is_tmdb': True,
         'tmdb_id': tmdb_id,
+        'similar_movies': similar_movies,
     }
     return render(request, 'movies/movie_detail_tmdb.html', context)
 
 
 def movie_detail(request, pk):
     """Страница фильма с плеером, рейтингом и комментариями"""
-    movie = get_object_or_404(Movie, pk=pk)
-    comments = movie.comments.all()
+    movie = get_object_or_404(
+        Movie.objects.select_related('author').prefetch_related('genres', 'comments__user'),
+        pk=pk
+    )
+    
+    # Увеличиваем счетчик просмотров
+    movie.views_count += 1
+    movie.save(update_fields=['views_count'])
+    
+    # Комментарии с оптимизацией
+    comments = movie.comments.select_related('user').order_by('-created_at')[:50]
+    
     avg_rating = movie.get_average_rating()
     user_rating = None
     
@@ -101,6 +134,9 @@ def movie_detail(request, pk):
             user_rating = Rating.objects.get(movie=movie, user=request.user)
         except Rating.DoesNotExist:
             pass
+    
+    # Похожие фильмы
+    similar_movies = movie.get_similar_movies(limit=6)
     
     # Обработка добавления комментария
     comment_form = CommentForm()
@@ -159,6 +195,7 @@ def movie_detail(request, pk):
         'user_rating': user_rating,
         'comment_form': comment_form,
         'rating_form': rating_form,
+        'similar_movies': similar_movies,
     }
     return render(request, 'movies/movie_detail.html', context)
 
@@ -173,6 +210,7 @@ def add_movie(request):
             movie.author = request.user
             movie.source = 'user'
             movie.save()
+            form.save_m2m()  # Сохраняем многие-ко-многим (жанры)
             return redirect('movie_detail', pk=movie.pk)
     else:
         form = MovieUploadForm()
@@ -184,29 +222,64 @@ def add_movie(request):
 
 
 def search_view(request):
-    query = request.GET.get('q')
-    results = []
+    """Поиск фильмов с результатами из локальной БД и TMDB"""
+    query = request.GET.get('q', '')
+    local_results = []
+    tmdb_results = []
 
     if query:
+        # Локальный поиск
+        local_results = Movie.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        ).select_related('author').prefetch_related('genres')[:12]
+        
+        # Поиск в TMDB
         data = search_movies(query)
-        results = data.get('results', [])
+        if data:
+            tmdb_results = data.get('results', [])[:12]
 
-    return render(request, 'movies/search.html', {'results': results})
+    context = {
+        'query': query,
+        'local_results': local_results,
+        'tmdb_results': tmdb_results,
+    }
+    return render(request, 'movies/search.html', context)
 
 
 def import_movie(request, tmdb_id):
+    """Импорт фильма из TMDB в локальную базу"""
     data = get_movie(tmdb_id)
+    
+    if not data:
+        return redirect('home')
 
-    movie, _ = Movie.objects.get_or_create(
+    # Получаем или создаем жанры
+    genre_objects = []
+    for genre_data in data.get('genres', []):
+        genre_name = genre_data.get('name', '')
+        if genre_name:
+            slug = genre_name.lower().replace(' ', '-').replace('-', '')
+            genre, _ = Genre.objects.get_or_create(
+                slug=slug,
+                defaults={'name': genre_name}
+            )
+            genre_objects.append(genre)
+
+    movie, created = Movie.objects.get_or_create(
         tmdb_id=tmdb_id,
         defaults={
             'title': data['title'],
             'description': data.get('overview', ''),
             'year': data.get('release_date', '')[:4] or None,
-            'poster': f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}",
-            'source': 'tmdb'
+            'poster': f"https://image.tmdb.org/t/p/w500{data.get('poster_path')}" if data.get('poster_path') else None,
+            'source': 'tmdb',
+            'category': 'movie',
         }
     )
+    
+    # Добавляем жанры
+    if genre_objects:
+        movie.genres.set(genre_objects)
 
     if request.user.is_authenticated:
         UserMovie.objects.get_or_create(
@@ -215,4 +288,17 @@ def import_movie(request, tmdb_id):
             defaults={'status': 'planned'}
         )
 
+    return redirect('movie_detail', pk=movie.pk)
+
+
+@login_required
+def delete_comment(request, comment_id):
+    """Удаление комментария (только автором)"""
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    if comment.user == request.user:
+        movie_pk = comment.movie.pk
+        comment.delete()
+        return redirect('movie_detail', pk=movie_pk)
+    
     return redirect('home')
