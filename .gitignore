@@ -1,38 +1,33 @@
 ```
-# Compiled Python files
-*.pyc
-__pycache__/
+# Database
+db.sqlite3
 
-# Dependencies
-venv/
-.venv/
+# Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Logs
-*.log
+# Dependencies
+.venv/
+venv/
+node_modules/
 
-# Coverage reports
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
 .coverage
-coverage/
-htmlcov/
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# OS files
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
 .DS_Store
-Thumbs.db
-
-# Build artifacts
-dist/
-build/
-target/
-.mypy_cache/
-.pytest_cache/
 ```
