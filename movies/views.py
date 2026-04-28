@@ -34,21 +34,18 @@ def home(request):
     if query:
         movies = movies.filter(Q(title__icontains=query) | Q(description__icontains=query))
         # Если это поиск, добавляем результаты из TMDB
-        if isinstance(movies, list):
-            pass
-        else:
-            tmdb_data = search_movies(query) or {}
-            tmdb_results = tmdb_data.get('results', [])[:6]
-            movies_list = list(movies)[:12]
-            context = {
-                'movies': movies_list,
-                'tmdb_movies': tmdb_results,
-                'query': query,
-                'sort': sort,
-                'genre': genre,
-                'genres': Movie.GENRE_CHOICES,
-            }
-            return render(request, 'movies/index.html', context)
+        tmdb_data = search_movies(query) or {}
+        tmdb_results = tmdb_data.get('results', [])[:6]
+        movies_list = list(movies)[:12]
+        context = {
+            'movies': movies_list,
+            'tmdb_movies': tmdb_results,
+            'query': query,
+            'sort': sort,
+            'genre': genre,
+            'genres': Movie.GENRE_CHOICES,
+        }
+        return render(request, 'movies/index.html', context)
     
     if not isinstance(movies, list):
         movies = list(movies[:12])

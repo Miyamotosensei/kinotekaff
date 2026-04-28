@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth.views import LogoutView
 from .views import submit_movie, upload_movie, profile_view
 from .views_auth import register_view, CustomLoginView
 
@@ -8,4 +9,5 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('register/', register_view, name='register'),
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
 ]
