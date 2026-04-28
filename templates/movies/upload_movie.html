@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить фильм - Кинотека{% endblock %}
+
+{% block content %}
+<section class="container mx-auto px-4 py-12 max-w-4xl">
+    <div class="mb-8">
+        <a href="{% url 'home' %}" class="text-kino-accent hover:text-kino-accent-hover transition-colors mb-4 inline-flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            Вернуться назад
+        </a>
+        <h1 class="text-3xl font-bold text-white flex items-center gap-3 mb-2">
+            <i class="fas fa-upload text-kino-accent"></i>
+            Загрузить свой фильм
+        </h1>
+        <p class="text-gray-400">Поделитесь своим фильмом с сообществом Кинотеки</p>
+    </div>
+
+    <div class="bg-kino-card rounded-2xl p-6 md:p-8 border border-gray-800 shadow-xl">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Основная информация -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-semibold text-white flex items-center gap-2 pb-2 border-b border-gray-700">
+                    <i class="fas fa-info-circle text-kino-accent"></i>
+                    Основная информация
+                </h3>
+                
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        {{ form.title.label }} <span class="text-kino-accent">*</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        {{ form.description.label }} <span class="text-kino-accent">*</span>
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            {{ form.category.label }} <span class="text-kino-accent">*</span>
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <p class="mt-1 text-sm text-red-400">{{ form.category.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.year.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            {{ form.year.label }}
+                        </label>
+                        {{ form.year }}
+                        {% if form.year.errors %}
+                            <p class="mt-1 text-sm text-red-400">{{ form.year.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.genres.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        {{ form.genres.label }}
+                    </label>
+                    {{ form.genres }}
+                    {% if form.genres.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.genres.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">Зажмите Ctrl/Cmd для выбора нескольких жанров</p>
+                </div>
+
+                <div>
+                    <label for="{{ form.quality.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        {{ form.quality.label }}
+                    </label>
+                    {{ form.quality }}
+                    {% if form.quality.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.quality.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Медиа файлы -->
+            <div class="space-y-4 pt-4">
+                <h3 class="text-xl font-semibold text-white flex items-center gap-2 pb-2 border-b border-gray-700">
+                    <i class="fas fa-photo-video text-kino-accent"></i>
+                    Медиа файлы
+                </h3>
+
+                <div>
+                    <label for="{{ form.poster_file.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        {{ form.poster_file.label }}
+                    </label>
+                    <div class="relative">
+                        {{ form.poster_file }}
+                        {% if form.poster_file.errors %}
+                            <p class="mt-1 text-sm text-red-400">{{ form.poster_file.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Рекомендуемый размер: 500x750px (соотношение 2:3)</p>
+                </div>
+
+                <div class="pt-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Видео <span class="text-gray-500">(один из вариантов)</span>
+                    </label>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="{{ form.video_file.id_for_label }}" class="block text-xs text-gray-400 mb-1">
+                                Загрузить видеофайл
+                            </label>
+                            {{ form.video_file }}
+                            {% if form.video_file.errors %}
+                                <p class="mt-1 text-sm text-red-400">{{ form.video_file.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 h-px bg-gray-700"></div>
+                            <span class="text-gray-500 text-sm">или</span>
+                            <div class="flex-1 h-px bg-gray-700"></div>
+                        </div>
+
+                        <div>
+                            <label for="{{ form.iframe_url.id_for_label }}" class="block text-xs text-gray-400 mb-1">
+                                URL стороннего плеера (videocdn.tv, etc.)
+                            </label>
+                            {{ form.iframe_url }}
+                            {% if form.iframe_url.errors %}
+                                <p class="mt-1 text-sm text-red-400">{{ form.iframe_url.errors.0 }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-500">Пример: https://videocdn.tv/embed/abc123</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="pt-6 border-t border-gray-700 flex items-center gap-4">
+                <button 
+                    type="submit" 
+                    class="bg-kino-accent hover:bg-kino-accent-hover text-white px-8 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-orange-500/20"
+                >
+                    <i class="fas fa-plus-circle"></i>
+                    Загрузить фильм
+                </button>
+                
+                <a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<style>
+    /* Стили для select множественного выбора */
+    select[multiple] {
+        background-color: #1a1a1a !important;
+        color: white !important;
+        border: 1px solid #374151 !important;
+        padding: 0.5rem !important;
+        border-radius: 0.5rem !important;
+    }
+    
+    select[multiple]:focus {
+        outline: none !important;
+        border-color: #f60 !important;
+        box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1) !important;
+    }
+    
+    select[multiple] option {
+        padding: 0.5rem !important;
+        margin: 0.25rem 0 !important;
+        border-radius: 0.25rem !important;
+    }
+    
+    select[multiple] option:checked {
+        background-color: #f60 !important;
+        color: white !important;
+    }
+</style>
+{% endblock %}
