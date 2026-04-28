@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, Avg
-from .tmdb import search_movies, get_movie
+from .tmdb import search_movies, get_movie, get_popular_movies, get_movie_videos, search_by_genre, get_genres
 from .models import Movie, UserMovie, Comment, Rating
 from .forms import CommentForm, RatingForm, MovieUploadForm
 
@@ -13,6 +13,7 @@ def home(request):
     """Главная страница с популярными фильмами"""
     # Получаем локальные фильмы
     movies = Movie.objects.all()
+    tmdb_movies = []
     
     # Фильтрация по жанру
     genre = request.GET.get('genre')
@@ -38,8 +39,9 @@ def home(request):
         else:
             tmdb_data = search_movies(query) or {}
             tmdb_results = tmdb_data.get('results', [])[:6]
+            movies_list = list(movies)[:12]
             context = {
-                'movies': list(movies)[:12],
+                'movies': movies_list,
                 'tmdb_movies': tmdb_results,
                 'query': query,
                 'sort': sort,
@@ -51,14 +53,40 @@ def home(request):
     if not isinstance(movies, list):
         movies = list(movies[:12])
     
+    # Если нет локальных фильмов, получаем популярные из TMDB
+    if not movies:
+        tmdb_data = get_popular_movies()
+        if tmdb_data and tmdb_data.get('results'):
+            tmdb_movies = tmdb_data.get('results', [])[:12]
+    
     context = {
         'movies': movies,
+        'tmdb_movies': tmdb_movies,
         'query': query,
         'sort': sort,
         'genre': genre,
         'genres': Movie.GENRE_CHOICES,
     }
     return render(request, 'movies/index.html', context)
+
+
+def movie_detail_tmdb(request, tmdb_id):
+    """Страница TMDB фильма с информацией и трейлером"""
+    movie_data = get_movie(tmdb_id)
+    
+    if not movie_data:
+        return redirect('home')
+    
+    # Получаем трейлер
+    trailer_key = get_movie_videos(tmdb_id)
+    
+    context = {
+        'movie': movie_data,
+        'trailer_key': trailer_key,
+        'is_tmdb': True,
+        'tmdb_id': tmdb_id,
+    }
+    return render(request, 'movies/movie_detail_tmdb.html', context)
 
 
 def movie_detail(request, pk):

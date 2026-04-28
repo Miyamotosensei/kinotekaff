@@ -30,14 +30,69 @@
         }
     </script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
             background-color: #141414;
             color: #ffffff;
         }
-        .movie-card:hover {
-            transform: scale(1.05);
+        
+        .movie-card {
+            text-decoration: none !important;
+            color: inherit !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            background-color: #1f1f1f !important;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: all 300ms ease;
+            position: relative;
+            z-index: 1;
         }
+        
+        .movie-card:hover {
+            transform: scale(1.05) !important;
+            z-index: 10 !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .movie-card-poster {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+        }
+        
+        .movie-card-poster img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 300ms ease;
+        }
+        
+        .movie-card:hover .movie-card-poster img {
+            transform: scale(1.1);
+        }
+        
+        .movie-card-info {
+            flex: 1 1 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+        }
+        
+        .movie-card-info h3 {
+            margin: 0 !important;
+        }
+        
+        .movie-card-info p {
+            margin: 0 !important;
+        }
+        
         .rating-badge {
             transition: all 0.2s ease;
         }
@@ -108,15 +163,6 @@
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
             </form>
-=======
-<html>
-<head>
-    <title>Кинотека</title>
-</head>
-<body>
-    <a href="/">Поиск</a>
-    <a href="/submit/">Добавить фильм</a>
-    <hr>
         </div>
     </nav>
 
