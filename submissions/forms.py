@@ -1,12 +1,16 @@
 from django import forms
+<<<<<<< HEAD
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+=======
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 from .models import MovieSubmission
 
 
 class MovieSubmissionForm(forms.ModelForm):
     class Meta:
         model = MovieSubmission
+<<<<<<< HEAD
         fields = ['title', 'description', 'year', 'poster']
 
 
@@ -48,3 +52,6 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['username'].help_text = ''
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
+=======
+        fields = ['title', 'description', 'year', 'poster']
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f

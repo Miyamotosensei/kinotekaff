@@ -1,7 +1,13 @@
 from django.db import models
+<<<<<<< HEAD
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
+=======
+
+from django.db import models
+from django.contrib.auth.models import User
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 class Movie(models.Model):
@@ -10,6 +16,7 @@ class Movie(models.Model):
         ('user', 'User'),
     ]
 
+<<<<<<< HEAD
     GENRE_CHOICES = [
         ('action', 'Экшен'),
         ('comedy', 'Комедия'),
@@ -90,6 +97,19 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.user.username} оценил {self.movie.title} на {self.rating}"
+=======
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    year = models.IntegerField(null=True, blank=True)
+    poster = models.URLField(blank=True)
+
+    tmdb_id = models.IntegerField(null=True, blank=True)
+
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES)
+
+    def __str__(self):
+        return self.title
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 class UserMovie(models.Model):

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -7,10 +8,16 @@ from django.db.models import Q, Avg
 from .tmdb import search_movies, get_movie
 from .models import Movie, UserMovie, Comment, Rating
 from .forms import CommentForm, RatingForm, MovieUploadForm
+=======
+from django.shortcuts import render, redirect
+from .tmdb import search_movies, get_movie
+from .models import Movie, UserMovie
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 def home(request):
     """Главная страница с популярными фильмами"""
+<<<<<<< HEAD
     # Получаем локальные фильмы
     movies = Movie.objects.all()
     
@@ -153,6 +160,9 @@ def add_movie(request):
         'form': form,
     }
     return render(request, 'movies/add_movie.html', context)
+=======
+    return render(request, 'movies/index.html')
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 
 def search_view(request):
@@ -187,4 +197,8 @@ def import_movie(request, tmdb_id):
             defaults={'status': 'planned'}
         )
 
+<<<<<<< HEAD
     return redirect('home')
+=======
+    return redirect('search')
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f

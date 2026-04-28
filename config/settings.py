@@ -105,9 +105,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
+<<<<<<< HEAD
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+=======
+LANGUAGE_CODE = 'ru-ru'
+
+TIME_ZONE = 'Europe/Moscow'
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
 
 USE_I18N = True
 
@@ -126,6 +132,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+<<<<<<< HEAD
 # TMDb
 TMDB_API_KEY = "c0c811e14b7d973d41c9c5bbb8d59a58"
 
@@ -133,3 +140,12 @@ TMDB_API_KEY = "c0c811e14b7d973d41c9c5bbb8d59a58"
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
+=======
+# Authentication
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'
+
+# TMDb
+TMDB_API_KEY = "c0c811e14b7d973d41c9c5bbb8d59a58"
+>>>>>>> 18c90f6d917a2e6eac59033df41c131b5f5dfd4f
