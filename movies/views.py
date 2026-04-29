@@ -10,7 +10,7 @@ from .forms import CommentForm, RatingForm, MovieUploadForm
 
 
 def home(request):
-    """Главная страница с фильтрацией и сортировкой"""
+    """Главная страница с фильтрацией, сортировкой и популярными фильмами из TMDB"""
     # Получаем все фильмы с оптимизацией
     movies = Movie.objects.select_related('author').prefetch_related('genres').all()
     
@@ -68,6 +68,9 @@ def home(request):
         tmdb_results = tmdb_data.get('results', [])[:6]
     else:
         tmdb_results = []
+        # Загружаем популярные фильмы из TMDB для главной страницы
+        popular_data = get_popular_movies()
+        tmdb_results = popular_data.get('results', [])[:12]
     
     # Пагинация
     paginator = Paginator(movies, 12)
