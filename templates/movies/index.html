@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load movie_tags %}
 
 {% block title %}Главная - Кинотека{% endblock %}
 
@@ -316,16 +317,13 @@
             <a href="{% url 'movie_detail_tmdb' movie.id %}" style="display: flex; flex-direction: column; height: 100%;" class="movie-card bg-kino-card rounded-xl overflow-hidden shadow-lg transition-all duration-300 group">
                 <!-- Poster -->
                 <div style="flex: 0 0 auto; width: 100%; aspect-ratio: 2/3;" class="relative overflow-hidden bg-gradient-to-br from-kino-card to-gray-900 flex items-center justify-center">
-                    {% if movie.poster_path %}
+                    {# Используем темплетег для формирования полного URL постера #}
                     <img 
-                        src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                        src="{{ movie.poster_path|tmdb_image_url:'w500' }}" 
                         alt="{{ movie.title }}"
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         onerror="this.src='https://via.placeholder.com/500x750?text=No+Poster'"
                     >
-                    {% else %}
-                    <img src="https://via.placeholder.com/500x750?text=No+Poster" alt="{{ movie.title }}" class="w-full h-full object-cover">
-                    {% endif %}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     
                     <!-- Rating Badge -->

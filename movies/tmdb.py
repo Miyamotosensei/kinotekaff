@@ -3,7 +3,12 @@ from django.conf import settings
 
 
 def get_popular_movies():
-    """Получить популярные фильмы из TMDB"""
+    """
+    Получить популярные фильмы из TMDB.
+    
+    Returns:
+        dict: Словарь с ключом 'results', содержащим список фильмов
+    """
     url = "https://api.themoviedb.org/3/movie/popular"
     params = {
         "api_key": settings.TMDB_API_KEY,
@@ -11,16 +16,29 @@ def get_popular_movies():
         "page": 1
     }
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         if response.status_code == 200:
-            return response.json()
+            data = response.json()
+            # Добавляем полный URL для постеров в каждый фильм
+            for movie in data.get('results', []):
+                if movie.get('poster_path'):
+                    movie['poster_url'] = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}"
+            return data
     except requests.exceptions.RequestException:
         pass
     return {"results": []}
 
 
 def search_movies(query):
-    """Поиск фильмов по названию"""
+    """
+    Поиск фильмов по названию в TMDB.
+    
+    Args:
+        query: Строка поискового запроса
+        
+    Returns:
+        dict: Словарь с ключом 'results', содержащим список фильмов
+    """
     url = "https://api.themoviedb.org/3/search/movie"
     params = {
         "api_key": settings.TMDB_API_KEY,
@@ -28,25 +46,44 @@ def search_movies(query):
         "language": "ru-RU"
     }
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         if response.status_code == 200:
-            return response.json()
+            data = response.json()
+            # Добавляем полный URL для постеров в каждый фильм
+            for movie in data.get('results', []):
+                if movie.get('poster_path'):
+                    movie['poster_url'] = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}"
+            return data
     except requests.exceptions.RequestException:
         pass
     return {"results": []}
 
 
 def get_movie(tmdb_id):
-    """Получить полную информацию о фильме"""
+    """
+    Получить полную информацию о фильме из TMDB.
+    
+    Args:
+        tmdb_id: ID фильма в базе TMDB
+        
+    Returns:
+        dict: Данные о фильме или пустой словарь при ошибке
+    """
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
     params = {
         "api_key": settings.TMDB_API_KEY,
         "language": "ru-RU"
     }
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         if response.status_code == 200:
-            return response.json()
+            data = response.json()
+            # Добавляем полный URL для постера прямо в данные
+            if data.get('poster_path'):
+                data['poster_url'] = f"https://image.tmdb.org/t/p/w500{data['poster_path']}"
+            if data.get('backdrop_path'):
+                data['backdrop_url'] = f"https://image.tmdb.org/t/p/original{data['backdrop_path']}"
+            return data
     except requests.exceptions.RequestException:
         pass
     return {}

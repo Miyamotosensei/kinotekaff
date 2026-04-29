@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load movie_tags static %}
 
 {% block title %}{{ movie.title }} - Кинотека{% endblock %}
 
@@ -8,8 +8,9 @@
     <!-- Backdrop/Hero Section -->
     {% if movie.backdrop_path %}
     <div class="relative h-[300px] md:h-[500px] overflow-hidden">
+        {# Используем темплетег для фонового изображения #}
         <img 
-            src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}" 
+            src="{{ movie.backdrop_path|tmdb_backdrop_url:'original' }}" 
             alt="{{ movie.title }}"
             class="w-full h-full object-cover"
         >
@@ -23,9 +24,10 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <!-- Left Column: Poster & Stats -->
             <div class="md:col-span-1">
+                {# Используем темплетег для постера #}
                 {% if movie.poster_path %}
                     <img 
-                        src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" 
+                        src="{{ movie.poster_path|tmdb_image_url:'w500' }}" 
                         alt="{{ movie.title }}"
                         class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow"
                     >
@@ -38,9 +40,10 @@
                     <!-- Rating -->
                     <div class="flex items-center justify-between">
                         <span class="text-gray-400">Рейтинг:</span>
+                        {# Используем темплетег для форматирования рейтинга #}
                         <div class="flex items-center gap-2">
                             <i class="fas fa-star text-kino-accent"></i>
-                            <span class="text-white font-bold text-lg">{{ movie.vote_average|floatformat:1 }}/10</span>
+                            <span class="text-white font-bold text-lg">{{ movie.vote_average|format_rating }}/10</span>
                         </div>
                     </div>
                     
@@ -54,7 +57,8 @@
                     {% if movie.release_date %}
                     <div class="flex items-center justify-between">
                         <span class="text-gray-400">Выход:</span>
-                        <span class="text-white">{{ movie.release_date|date:"d.m.Y" }}</span>
+                        {# Используем темплетег для извлечения года #}
+                        <span class="text-white">{{ movie.release_date|get_year }}</span>
                     </div>
                     {% endif %}
 
