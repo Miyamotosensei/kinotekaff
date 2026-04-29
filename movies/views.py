@@ -35,14 +35,24 @@ def home(request):
     
     # Сортировка
     sort = request.GET.get('sort', '-created_at')
+    valid_sorts = ['-created_at', 'created_at', 'title', '-title', 'year', '-year', 'views', '-views_count', 'rating']
+    if sort not in valid_sorts:
+        sort = '-created_at'
+        
     if sort == 'rating':
         # Сортировка по рейтингу через аннотацию
         movies = movies.annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')
     elif sort == 'title':
         movies = movies.order_by('title')
+    elif sort == '-title':
+        movies = movies.order_by('-title')
     elif sort == 'year':
+        movies = movies.order_by('year')
+    elif sort == '-year':
         movies = movies.order_by('-year')
     elif sort == 'views':
+        movies = movies.order_by('views_count')
+    elif sort == '-views_count':
         movies = movies.order_by('-views_count')
     else:  # По умолчанию новые
         movies = movies.order_by('-created_at')
@@ -112,12 +122,21 @@ def movie_detail_tmdb(request, tmdb_id):
     return render(request, 'movies/movie_detail_tmdb.html', context)
 
 
-def movie_detail(request, pk):
+def movie_detail(request, pk=None, slug=None):
     """Страница фильма с плеером, рейтингом и комментариями"""
-    movie = get_object_or_404(
-        Movie.objects.select_related('author').prefetch_related('genres', 'comments__user'),
-        pk=pk
-    )
+    # Поддержка как по ID, так и по slug
+    if pk:
+        movie = get_object_or_404(
+            Movie.objects.select_related('author').prefetch_related('genres', 'comments__user'),
+            pk=pk
+        )
+    elif slug:
+        movie = get_object_or_404(
+            Movie.objects.select_related('author').prefetch_related('genres', 'comments__user'),
+            slug=slug
+        )
+    else:
+        return redirect('home')
     
     # Увеличиваем счетчик просмотров
     movie.views_count += 1
@@ -161,7 +180,7 @@ def movie_detail(request, pk):
                         'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M')
                     }
                 })
-            return redirect('movie_detail', pk=pk)
+            return redirect('movie_detail_slug', slug=movie.slug)
     
     # Обработка оценки
     rating_form = RatingForm()
@@ -185,7 +204,7 @@ def movie_detail(request, pk):
                     'avg_rating': movie.get_average_rating(),
                     'rating_count': movie.get_rating_count()
                 })
-            return redirect('movie_detail', pk=pk)
+            return redirect('movie_detail_slug', slug=movie.slug)
     
     context = {
         'movie': movie,
@@ -320,8 +339,8 @@ def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     
     if comment.user == request.user:
-        movie_pk = comment.movie.pk
+        movie_slug = comment.movie.slug
         comment.delete()
-        return redirect('movie_detail', pk=movie_pk)
+        return redirect('movie_detail_slug', slug=movie_slug)
     
     return redirect('home')
