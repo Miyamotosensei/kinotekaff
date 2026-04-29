@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% load movie_tags static %}
+
+{% block title %}{{ movie.title }} - Кинотека{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-kino-bg">
+    <!-- Backdrop/Hero Section -->
+    {% if movie.backdrop_path %}
+    <div class="relative h-[300px] md:h-[500px] overflow-hidden">
+        {# Используем темплетег для фонового изображения #}
+        <img 
+            src="{{ movie.backdrop_path|tmdb_backdrop_url:'original' }}" 
+            alt="{{ movie.title }}"
+            class="w-full h-full object-cover"
+        >
+        <div class="absolute inset-0 bg-gradient-to-t from-kino-bg via-kino-bg/50 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-kino-bg to-transparent"></div>
+    </div>
+    {% endif %}
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Movie Info Section -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <!-- Left Column: Poster & Stats -->
+            <div class="md:col-span-1">
+                {# Используем темплетег для постера #}
+                {% if movie.poster_path %}
+                    <img 
+                        src="{{ movie.poster_path|tmdb_image_url:'w500' }}" 
+                        alt="{{ movie.title }}"
+                        class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow"
+                    >
+                {% else %}
+                    <img src="https://via.placeholder.com/500x750?text=No+Poster" alt="{{ movie.title }}" class="w-full rounded-lg mb-6 shadow-xl hover:shadow-2xl transition-shadow">
+                {% endif %}
+
+                <!-- Stats Box -->
+                <div class="bg-kino-card rounded-lg p-4 space-y-3">
+                    <!-- Rating -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Рейтинг:</span>
+                        {# Используем темплетег для форматирования рейтинга #}
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-star text-kino-accent"></i>
+                            <span class="text-white font-bold text-lg">{{ movie.vote_average|format_rating }}/10</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Votes -->
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Голосов:</span>
+                        <span class="text-white">{{ movie.vote_count }}</span>
+                    </div>
+
+                    <!-- Release Date -->
+                    {% if movie.release_date %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Выход:</span>
+                        {# Используем темплетег для извлечения года #}
+                        <span class="text-white">{{ movie.release_date|get_year }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Popularity -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Популярность:</span>
+                        <span class="text-white">{{ movie.popularity|floatformat:0 }}</span>
+                    </div>
+
+                    <!-- Source Badge -->
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <a href="{% url 'import_movie' movie.id %}" class="w-full bg-kino-accent hover:bg-kino-accent-hover text-white py-2 rounded-lg font-semibold transition-colors block text-center">
+                            <i class="fas fa-plus mr-1"></i>Добавить в библиотеку
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Details -->
+            <div class="md:col-span-3">
+                <!-- Title -->
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                    {{ movie.title }}
+                </h1>
+                
+                {% if movie.original_title != movie.title %}
+                <p class="text-gray-400 text-lg mb-6">{{ movie.original_title }}</p>
+                {% endif %}
+
+                <!-- Genres -->
+                {% if movie.genres %}
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% for genre in movie.genres %}
+                    <span class="inline-block px-3 py-1 bg-kino-accent text-white rounded-full text-sm font-semibold">
+                        {{ genre.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Overview -->
+                {% if movie.overview %}
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-white mb-4">Описание</h3>
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        {{ movie.overview }}
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Key Details -->
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    {% if movie.budget %}
+                    <div>
+                        <h4 class="text-gray-400 text-sm mb-1">Бюджет</h4>
+                        <p class="text-white font-semibold">${{ movie.budget|floatformat:0 }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if movie.revenue %}
+                    <div>
+                        <h4 class="text-gray-400 text-sm mb-1">Сборы</h4>
+                        <p class="text-white font-semibold">${{ movie.revenue|floatformat:0 }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if movie.runtime %}
+                    <div>
+                        <h4 class="text-gray-400 text-sm mb-1">Длительность</h4>
+                        <p class="text-white font-semibold">{{ movie.runtime }} мин</p>
+                    </div>
+                    {% endif %}
+
+                    {% if movie.status %}
+                    <div>
+                        <h4 class="text-gray-400 text-sm mb-1">Статус</h4>
+                        <p class="text-white font-semibold">{{ movie.status }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Production Companies -->
+                {% if movie.production_companies %}
+                <div class="mb-8">
+                    <h4 class="text-gray-400 text-sm mb-2">Продюсерские компании</h4>
+                    <div class="flex flex-wrap gap-2">
+                        {% for company in movie.production_companies %}
+                        <span class="text-gray-300 text-sm">{{ company.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Trailer Section -->
+        {% if trailer_key %}
+        <div class="mb-12">
+            <h3 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                <i class="fas fa-play-circle text-kino-accent"></i>
+                Трейлер
+            </h3>
+            <div class="relative w-full bg-black rounded-lg overflow-hidden shadow-xl">
+                <div class="aspect-video">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube.com/embed/{{ trailer_key }}" 
+                        title="{{ movie.title }}"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        class="w-full h-full"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Comments Section -->
+        <div class="mb-12">
+            <h3 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                <i class="fas fa-comments text-kino-accent"></i>
+                Обсуждение
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Add Comment Form -->
+                {% if user.is_authenticated %}
+                <div class="md:col-span-1">
+                    <div class="bg-kino-card rounded-lg p-6">
+                        <h4 class="text-white font-bold mb-4">Оставить комментарий</h4>
+                        <form method="POST" class="space-y-4" action="#comments">
+                            {% csrf_token %}
+                            <div>
+                                <label class="text-gray-400 text-sm mb-2 block">Комментарий</label>
+                                <textarea 
+                                    name="comment"
+                                    maxlength="1000"
+                                    class="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-kino-accent resize-none"
+                                    placeholder="Ваш комментарий..."
+                                    rows="5"
+                                ></textarea>
+                            </div>
+                            <button 
+                                type="submit" 
+                                class="w-full bg-kino-accent hover:bg-kino-accent-hover text-white py-2 rounded-lg font-semibold transition-colors"
+                            >
+                                <i class="fas fa-paper-plane mr-2"></i>Отправить
+                            </button>
+                        </form>
+
+                        <hr class="border-gray-700 my-6">
+
+                        <h4 class="text-white font-bold mb-4">Оценить</h4>
+                        <div class="flex gap-1 mb-4" id="ratingStars">
+                            {% for i in "12345678910" %}
+                            <button 
+                                type="button"
+                                onclick="setRating({{ forloop.counter }})"
+                                class="text-2xl text-gray-600 hover:text-kino-accent transition-colors"
+                                data-rating="{{ forloop.counter }}"
+                            >
+                                <i class="fas fa-star"></i>
+                            </button>
+                            {% endfor %}
+                        </div>
+                        <p id="ratingText" class="text-gray-400 text-sm">Наведите и кликните</p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="md:col-span-1">
+                    <div class="bg-kino-card rounded-lg p-6 text-center">
+                        <p class="text-gray-400 mb-4">Чтобы оставить комментарий, нужно войти</p>
+                        <a href="{% url 'login' %}" class="inline-block bg-kino-accent hover:bg-kino-accent-hover text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            Войти
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="md:col-span-2 bg-kino-card rounded-lg p-6">
+                    <h4 class="text-white font-bold mb-4">Комментарии (0)</h4>
+                    <div class="space-y-4">
+                        <div class="text-center py-8">
+                            <p class="text-gray-400">Пока нет комментариев</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRating = 0;
+
+    // Rating stars hover
+    document.querySelectorAll('#ratingStars button').forEach(star => {
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            highlightStars(rating);
+            document.getElementById('ratingText').textContent = rating + ' из 10';
+        });
+
+        star.addEventListener('mouseleave', function() {
+            highlightStars(currentRating);
+            if (currentRating === 0) {
+                document.getElementById('ratingText').textContent = 'Наведите и кликните';
+            }
+        });
+    });
+
+    function highlightStars(rating) {
+        document.querySelectorAll('#ratingStars button').forEach(star => {
+            const starRating = parseInt(star.dataset.rating);
+            if (starRating <= rating) {
+                star.classList.remove('text-gray-600');
+                star.classList.add('text-kino-accent');
+            } else {
+                star.classList.remove('text-kino-accent');
+                star.classList.add('text-gray-600');
+            }
+        });
+    }
+
+    function setRating(rating) {
+        currentRating = rating;
+        highlightStars(rating);
+        document.getElementById('ratingText').textContent = 'Оценка: ' + rating + ' из 10';
+        
+        // Simulate rating save (in production, send to server)
+        console.log('Rating set to:', rating);
+    }
+</script>
+{% endblock %}

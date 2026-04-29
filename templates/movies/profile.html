@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - Кинотека{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="profile-avatar">
+        {{ user.username|first|upper }}
+    </div>
+    <div class="profile-info">
+        <h2>{{ user.username }}</h2>
+        <p>Дата регистрации: {{ user.date_joined|date:"d E Y" }}</p>
+        <p class="mb-0">Email: {{ user.email }}</p>
+    </div>
+</div>
+
+<!-- User's Movies Section -->
+<section class="mb-5">
+    <h2 class="section-title">Мои загруженные фильмы</h2>
+    
+    {% if movies %}
+        <div class="movies-grid">
+            {% for movie in movies %}
+                <div class="movie-card">
+                    {% if movie.rating %}
+                        {% if movie.rating >= 7.5 %}
+                            <span class="rating-badge rating-high">{{ movie.rating }}</span>
+                        {% elif movie.rating >= 5 %}
+                            <span class="rating-badge rating-medium">{{ movie.rating }}</span>
+                        {% else %}
+                            <span class="rating-badge rating-low">{{ movie.rating }}</span>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if movie.poster %}
+                        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="movie-poster">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ movie.title }}" class="movie-poster">
+                    {% endif %}
+                    
+                    <div class="movie-info">
+                        <h3 class="movie-title">{{ movie.title }}</h3>
+                        <p class="movie-year">{{ movie.year|default:"—" }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted mb-3">Вы ещё не загрузили ни одного фильма.</p>
+            <a href="{% url 'upload_movie' %}" class="btn btn-orange">Загрузить первый фильм</a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Favorites Section (Optional) -->
+{% if favorites %}
+<section class="mb-5">
+    <h2 class="section-title">Избранное</h2>
+    <div class="movies-grid">
+        {% for movie in favorites %}
+            <div class="movie-card">
+                {% if movie.rating %}
+                    {% if movie.rating >= 7.5 %}
+                        <span class="rating-badge rating-high">{{ movie.rating }}</span>
+                    {% elif movie.rating >= 5 %}
+                        <span class="rating-badge rating-medium">{{ movie.rating }}</span>
+                    {% else %}
+                        <span class="rating-badge rating-low">{{ movie.rating }}</span>
+                    {% endif %}
+                {% endif %}
+                
+                {% if movie.poster %}
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="movie-poster">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ movie.title }}" class="movie-poster">
+                {% endif %}
+                
+                <div class="movie-info">
+                    <h3 class="movie-title">{{ movie.title }}</h3>
+                    <p class="movie-year">{{ movie.year|default:"—" }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

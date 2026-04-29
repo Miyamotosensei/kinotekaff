@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="get">
+    <input type="text" name="q" placeholder="Поиск фильма">
+    <button type="submit">Искать</button>
+</form>
+
+{% for movie in results %}
+    <div>
+        <h3>{{ movie.title }}</h3>
+        <p>{{ movie.release_date }}</p>
+        <a href="/import/{{ movie.id }}/">Добавить</a>
+    </div>
+{% endfor %}
+{% endblock %}

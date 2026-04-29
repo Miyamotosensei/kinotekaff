@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Кинотека{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kino-bg': '#0a0a0a',
+                        'kino-card': '#1a1a1a',
+                        'kino-accent': '#f60',
+                        'kino-accent-hover': '#e65c00',
+                        'kino-text': '#ffffff',
+                        'kino-text-secondary': '#a3a3a3',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+        }
+        
+        /* Glassmorphism Navbar */
+        .glass-nav {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Обёртка карточки фильма - для единообразия сетки */
+        .movie-card-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* Карточка фильма - основной контейнер */
+        .movie-card {
+            text-decoration: none !important;
+            color: inherit !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            background-color: #1a1a1a !important;
+            border-radius: 0.75rem !important;
+            overflow: hidden !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+            transition: all 300ms ease !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        .movie-card:hover {
+            transform: scale(1.05) !important;
+            z-index: 10 !important;
+            box-shadow: 0 20px 25px -5px rgba(255, 102, 0, 0.2) !important;
+        }
+        
+        /* Постер фильма - фиксированное соотношение сторон */
+        .movie-card-poster {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            aspect-ratio: 2 / 3 !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(to bottom right, #1a1a1a, #2a2a2a) !important;
+        }
+        
+        .movie-card-poster img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 300ms ease !important;
+        }
+        
+        .movie-card:hover .movie-card-poster img {
+            transform: scale(1.1) !important;
+        }
+        
+        /* Информация о фильме */
+        .movie-card-info {
+            flex: 1 1 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            padding: 0.75rem !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Название фильма - ограничение по высоте */
+        .movie-card-title {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            margin: 0 0 0.25rem 0 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            line-height: 1.4 !important;
+            text-align: center !important;
+        }
+        
+        /* Мета-информация (год, категория) */
+        .movie-card-meta {
+            color: #a3a3a3 !important;
+            font-size: 0.75rem !important;
+            margin: 0 !important;
+            text-align: center !important;
+        }
+        
+        /* Бейдж качества */
+        .quality-badge {
+            position: absolute !important;
+            bottom: 8px !important;
+            right: 8px !important;
+            padding: 2px 8px !important;
+            border-radius: 4px !important;
+            font-size: 10px !important;
+            font-weight: bold !important;
+            background: linear-gradient(135deg, #f60, #e65c00) !important;
+            color: white !important;
+            z-index: 2 !important;
+        }
+        
+        /* Бейдж рейтинга */
+        .rating-badge {
+            transition: all 0.2s ease !important;
+        }
+        
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            min-width: 200px;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+        
+        .profile-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #a3a3a3;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(246, 96, 0, 0.1);
+            color: #f60;
+        }
+        
+        .dropdown-item:first-child {
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .dropdown-item:last-child {
+            border-radius: 0 0 12px 12px;
+        }
+    </style>
+</head>
+<body class="bg-kino-bg min-h-screen flex flex-col">
+    <!-- Navbar with Glassmorphism -->
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="text-2xl font-bold text-kino-accent hover:text-kino-accent-hover transition-colors flex items-center gap-2">
+                    <i class="fas fa-film"></i>
+                    <span>Кинотека</span>
+                </a>
+                
+                <!-- Search Bar (Center) -->
+                <form action="{% url 'home' %}" method="GET" class="flex-1 max-w-xl hidden md:flex">
+                    <div class="relative w-full">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ query|default:'' }}"
+                            placeholder="Поиск фильмов..." 
+                            class="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-xl px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700/50 backdrop-blur-sm"
+                        >
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button type="submit" class="ml-2 bg-kino-accent hover:bg-kino-accent-hover text-white px-5 py-2.5 rounded-xl transition-colors font-medium">
+                        Найти
+                    </button>
+                </form>
+                
+                <!-- User Actions (Right) -->
+                <div class="flex items-center gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'upload_movie' %}" class="hidden sm:flex items-center gap-2 bg-kino-accent hover:bg-kino-accent-hover text-white px-5 py-2.5 rounded-xl transition-all transform hover:scale-105 font-medium shadow-lg shadow-orange-500/20">
+                            <i class="fas fa-upload"></i>
+                            <span>Загрузить свой фильм</span>
+                        </a>
+                        
+                        <!-- Profile Dropdown -->
+                        <div class="profile-dropdown">
+                            <button class="flex items-center gap-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl px-3 py-2 transition-colors border border-gray-700/50">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full object-cover">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-full bg-kino-accent flex items-center justify-center text-white font-bold">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <span class="hidden sm:inline text-white font-medium">{{ user.username }}</span>
+                                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                            </button>
+                            
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>Профиль</span>
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-heart"></i>
+                                    <span>Избранное</span>
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Настройки</span>
+                                </a>
+                                <div class="border-t border-gray-700/50 my-1"></div>
+                                <a href="{% url 'logout' %}" class="dropdown-item text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Выйти</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-kino-text hover:text-kino-accent transition-colors px-4 py-2 font-medium">
+                            Войти
+                        </a>
+                        <a href="{% url 'register' %}" class="bg-kino-accent hover:bg-kino-accent-hover text-white px-5 py-2.5 rounded-xl transition-all transform hover:scale-105 font-medium">
+                            Регистрация
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Mobile Search -->
+            <form action="{% url 'home' %}" method="GET" class="mt-3 md:hidden flex">
+                <div class="relative w-full">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        value="{{ query|default:'' }}"
+                        placeholder="Поиск фильмов..." 
+                        class="w-full bg-gray-800/50 text-white placeholder-gray-400 rounded-xl px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-kino-accent border border-gray-700/50 backdrop-blur-sm"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-kino-card border-t border-gray-800 mt-auto">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- Brand -->
+                <div>
+                    <a href="{% url 'home' %}" class="text-2xl font-bold text-kino-accent flex items-center gap-2 mb-4">
+                        <i class="fas fa-film"></i>
+                        <span>Кинотека</span>
+                    </a>
+                    <p class="text-gray-400 text-sm">
+                        Современный онлайн-кинотеатр с лучшими фильмами и сериалами.
+                    </p>
+                </div>
+                
+                <!-- Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Разделы</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{% url 'home' %}" class="hover:text-kino-accent transition-colors">Главная</a></li>
+                        <li><a href="?category=movie" class="hover:text-kino-accent transition-colors">Фильмы</a></li>
+                        <li><a href="?category=series" class="hover:text-kino-accent transition-colors">Сериалы</a></li>
+                        <li><a href="?category=cartoon" class="hover:text-kino-accent transition-colors">Мультфильмы</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Social -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Мы в соцсетях</h4>
+                    <div class="flex items-center gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-kino-accent hover:text-white transition-all transform hover:scale-110">
+                            <i class="fab fa-vk"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-kino-accent hover:text-white transition-all transform hover:scale-110">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-kino-accent hover:text-white transition-all transform hover:scale-110">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
+                <p>&copy; {% now "Y" %} Кинотека. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
