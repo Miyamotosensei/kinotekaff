@@ -48,6 +48,14 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        /* Обёртка карточки фильма - для единообразия сетки */
+        .movie-card-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* Карточка фильма - основной контейнер */
         .movie-card {
             text-decoration: none !important;
             color: inherit !important;
@@ -55,12 +63,12 @@
             flex-direction: column !important;
             height: 100% !important;
             background-color: #1a1a1a !important;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            transition: all 300ms ease;
-            position: relative;
-            z-index: 1;
+            border-radius: 0.75rem !important;
+            overflow: hidden !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+            transition: all 300ms ease !important;
+            position: relative !important;
+            z-index: 1 !important;
         }
         
         .movie-card:hover {
@@ -69,45 +77,77 @@
             box-shadow: 0 20px 25px -5px rgba(255, 102, 0, 0.2) !important;
         }
         
+        /* Постер фильма - фиксированное соотношение сторон */
         .movie-card-poster {
             flex: 0 0 auto !important;
             width: 100% !important;
+            aspect-ratio: 2 / 3 !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(to bottom right, #1a1a1a, #2a2a2a) !important;
         }
         
         .movie-card-poster img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 300ms ease;
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 300ms ease !important;
         }
         
         .movie-card:hover .movie-card-poster img {
-            transform: scale(1.1);
+            transform: scale(1.1) !important;
         }
         
+        /* Информация о фильме */
         .movie-card-info {
             flex: 1 1 auto !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
+            padding: 0.75rem !important;
+            background-color: #1a1a1a !important;
         }
         
+        /* Название фильма - ограничение по высоте */
+        .movie-card-title {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            margin: 0 0 0.25rem 0 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            line-height: 1.4 !important;
+            text-align: center !important;
+        }
+        
+        /* Мета-информация (год, категория) */
+        .movie-card-meta {
+            color: #a3a3a3 !important;
+            font-size: 0.75rem !important;
+            margin: 0 !important;
+            text-align: center !important;
+        }
+        
+        /* Бейдж качества */
         .quality-badge {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #f60, #e65c00);
-            color: white;
-            z-index: 2;
+            position: absolute !important;
+            bottom: 8px !important;
+            right: 8px !important;
+            padding: 2px 8px !important;
+            border-radius: 4px !important;
+            font-size: 10px !important;
+            font-weight: bold !important;
+            background: linear-gradient(135deg, #f60, #e65c00) !important;
+            color: white !important;
+            z-index: 2 !important;
         }
         
+        /* Бейдж рейтинга */
         .rating-badge {
-            transition: all 0.2s ease;
+            transition: all 0.2s ease !important;
         }
         
         /* Profile Dropdown */
