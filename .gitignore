@@ -1,33 +1,66 @@
 ```
-# Database
-db.sqlite3
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
+*.py~
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# Dependencies
+.venv/
+venv/
 env/
+ENV/
 pip-log.txt
 pip-delete-this-directory.txt
 .tox/
 .coverage
+htmlcov/
+.cov/
 .coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
+.nyc_output/
+istanbul/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# Build artifacts
+build/
+dist/
+*.egg
+*.egg-info/
+.eggs/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*
+!requirements.txt
+!Pipfile
+!Pipfile.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 ```

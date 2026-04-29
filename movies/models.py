@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
+from django.utils.text import slugify
 
 
 class Movie(models.Model):
@@ -32,6 +33,7 @@ class Movie(models.Model):
     ]
 
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True, help_text="SEO-friendly URL")
     description = models.TextField()
     year = models.IntegerField(null=True, blank=True)
     poster = models.URLField(blank=True, null=True)
@@ -71,10 +73,24 @@ class Movie(models.Model):
             models.Index(fields=['-created_at']),
             models.Index(fields=['year']),
             models.Index(fields=['category']),
+            models.Index(fields=['slug']),
         ]
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        # Автоматическая генерация slug при создании
+        if not self.slug and self.title:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            # Проверка на уникальность
+            while Movie.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
     
     def get_average_rating(self):
         """Получить среднюю оценку фильма"""
